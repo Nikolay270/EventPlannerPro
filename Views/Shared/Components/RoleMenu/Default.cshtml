@@ -1,0 +1,15 @@
+﻿@* Shows dynamic nav items based on roles *@
+
+@if ((bool)ViewBag.IsParticipant)
+{
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-controller="Organizer" asp-action="Become">Become Organizer</a>
+    </li>
+}
+
+@if ((bool)ViewBag.IsAdmin)
+{
+    <li class="nav-item">
+        <a class="nav-link text-dark" asp-controller="Admin" asp-action="Applications">Applications</a>
+    </li>
+}

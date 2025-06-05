@@ -1,0 +1,45 @@
+﻿@page
+@model EventPlannerPro.Areas.Identity.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
+            <!-- Removed asp-validation-summary -->
+
+            <div class="form-group">
+                <label asp-for="Input.Email"></label>
+                <input asp-for="Input.Email" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.Password"></label>
+                <input asp-for="Input.Password" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Input.ConfirmPassword"></label>
+                <input asp-for="Input.ConfirmPassword" class="form-control" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Log any field-level validation issues to the console
+        const errors = document.querySelectorAll(".text-danger");
+        errors.forEach(e => {
+            if (e.textContent.trim()) {
+                console.warn("Validation warning:", e.textContent.trim());
+            }
+        });
+    </script>
+}

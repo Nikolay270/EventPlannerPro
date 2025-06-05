@@ -1,0 +1,16 @@
+@model IEnumerable<EventPlannerPro.Models.Activity>
+
+    <h2>Activities</h2>
+
+    <a class="btn btn-success mb-3" href="/Activities/Create">Create Activity</a>
+
+    @foreach (var item in Model)
+{
+    <div class="card mb-2">
+        <div class="card-body">
+            <h5>@item.Title</h5>
+            <p>@item.Place – @item.StartTime.ToShortDateString() – @item.City?.Name</p>
+            <a href="/Activities/Details/@item.Id" class="btn btn-info">Details</a>
+        </div>
+    </div>
+}
