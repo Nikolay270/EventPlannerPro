@@ -15,9 +15,10 @@ namespace EventPlannerPro.Data
         {
         }
 
-        public DbSet<Activity> Activities { get; set; }
-        public DbSet<City> Cities { get; set; }
-        public DbSet<Category> Categories { get; set; }
+        public DbSet<Activity> Activities { get; set; } = null!;
+        public DbSet<ActivityUser> ActivityUsers { get; set; } = null!;
+        public DbSet<City> Cities { get; set; } = null!;
+        public DbSet<Category> Categories { get; set; } = null!;
 
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -43,6 +44,19 @@ namespace EventPlannerPro.Data
                 new Category { Id = 2, Name = "Festival" },
                 new Category { Id = 3, Name = "Workshop" }
             );
+
+            builder.Entity<ActivityUser>()
+               .HasKey(au => new { au.UserId, au.ActivityId });
+
+            builder.Entity<ActivityUser>()
+                .HasOne(au => au.User)
+                .WithMany()
+                .HasForeignKey(au => au.UserId);
+
+            builder.Entity<ActivityUser>()
+                .HasOne(au => au.Activity)
+                .WithMany(a => a.Participants)
+                .HasForeignKey(au => au.ActivityId);
         }
     }
 }

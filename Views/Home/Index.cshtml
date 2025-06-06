@@ -2,8 +2,12 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1>Welcome to EventPlannerPro</h1>
-    <p>Plan and discover local events in your city.</p>
-    <a class="btn btn-primary" href="/Activities">Browse Activities</a>
+<div class="text-center mt-5">
+    <h1 class="display-4">Welcome to EventPlannerPro</h1>
+    <p class="lead">Plan, browse, and join amazing activities across the country.</p>
+
+    <div class="mt-4">
+        <a asp-controller="Activities" asp-action="Index" class="btn btn-primary btn-lg me-3">Browse Activities</a>
+        <a asp-controller="Activities" asp-action="Create" class="btn btn-success btn-lg">Create Activity</a>
+    </div>
 </div>

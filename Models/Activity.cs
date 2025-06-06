@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EventPlannerPro.Models
 {
@@ -24,18 +23,17 @@ namespace EventPlannerPro.Models
         [Required]
         [Display(Name = "City")]
         public int CityId { get; set; }
-
         public City? City { get; set; }
 
         [Required]
         [Display(Name = "Category")]
         public int CategoryId { get; set; }
-
         public Category? Category { get; set; }
 
         public string? CreatedById { get; set; }
+
         public string? Description { get; set; }
 
-
+        public ICollection<ActivityUser> Participants { get; set; } = new List<ActivityUser>();
     }
 }

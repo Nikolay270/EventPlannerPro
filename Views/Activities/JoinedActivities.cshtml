@@ -1,0 +1,41 @@
+﻿@model IEnumerable<EventPlannerPro.Models.Activity>
+@{
+    ViewData["Title"] = "Joined Activities";
+}
+
+<h2 class="mb-4">Joined Activities</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">
+        You haven't joined any activities yet. <a asp-action="Create">Create one now</a>!
+    </div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>City</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Title</td>
+                    <td>@item.City?.Name</td>
+                    <td>@item.StartTime.ToString("g")</td>
+                    <td>@item.EndTime.ToString("g")</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

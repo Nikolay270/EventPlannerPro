@@ -1,16 +1,55 @@
 @model IEnumerable<EventPlannerPro.Models.Activity>
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
+@inject SignInManager<IdentityUser> SignInManager
 
-    <h2>Activities</h2>
-
-    <a class="btn btn-success mb-3" href="/Activities/Create">Create Activity</a>
-
-    @foreach (var item in Model)
-{
-    <div class="card mb-2">
-        <div class="card-body">
-            <h5>@item.Title</h5>
-            <p>@item.Place – @item.StartTime.ToShortDateString() – @item.City?.Name</p>
-            <a href="/Activities/Details/@item.Id" class="btn btn-info">Details</a>
-        </div>
-    </div>
+@{
+    ViewData["Title"] = "All Activities";
 }
+
+<h1>All Activities</h1>
+
+<p>
+    <a class="btn btn-primary" asp-controller="Activities" asp-action="Create">Create New</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Place</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>City</th>
+            <th>Category</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Title</td>
+                <td>@item.Place</td>
+                <td>@item.StartTime</td>
+                <td>@item.EndTime</td>
+                <td>@item.City?.Name</td>
+                <td>@item.Category?.Name</td>
+                <td>
+                    <a class="btn btn-info" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <form asp-action="Join" asp-route-id="@item.Id" method="post" style="display:inline">
+                            <button type="submit" class="btn btn-success">Join</button>
+                        </form>
+                    }
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
+                        <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
