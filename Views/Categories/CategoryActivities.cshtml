@@ -1,0 +1,33 @@
+﻿@model IEnumerable<EventPlannerPro.Models.Activity>
+
+@{
+    ViewData["Title"] = "Activities by Category";
+}
+
+<h2 class="mb-4">Activities in this Category</h2>
+
+@if (!Model.Any())
+{
+    <p>No activities found for this category.</p>
+}
+else
+{
+    <div class="row">
+        @foreach (var activity in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <img src="@activity.PhotoUrl" class="card-img-top" alt="Activity image">
+                    <div class="card-body">
+                        <h5 class="card-title">@activity.Title</h5>
+                        <p class="card-text">
+                            <strong>City:</strong> @activity.City?.Name <br />
+                            <strong>Date:</strong> @activity.StartTime.ToString("yyyy-MM-dd") <br />
+                            <a href="/Activities/Details/@activity.Id" class="btn btn-sm btn-outline-primary mt-2">View Details</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

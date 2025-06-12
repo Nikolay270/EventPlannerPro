@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using EventPlannerPro.Data;
 using EventPlannerPro.Models;
-using EventPlannerPro.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EventPlannerPro.Controllers
 {
@@ -14,31 +15,59 @@ namespace EventPlannerPro.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View(_context.Categories.ToList());
+            var categories = await _context.Categories.ToListAsync();
+            return View("CategoryList", categories); // Use custom view to avoid conflict
         }
 
-        public IActionResult Create()
+        [Authorize(Roles = "Admin")]
+        public IActionResult Create() => View();
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Create(Category category)
         {
-            return View(new CategoryCreateViewModel());
+            if (ModelState.IsValid)
+            {
+                _context.Add(category);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(category);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var category = await _context.Categories.FindAsync(id);
+            return category == null ? NotFound() : View(category);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(CategoryCreateViewModel model)
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Edit(int id, Category category)
         {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
+            if (id != category.Id) return NotFound();
+            if (!ModelState.IsValid) return View(category);
 
-            var category = new Category { Name = model.Name.Trim() };
-            _context.Categories.Add(category);
-            _context.SaveChanges();
-
-            TempData["Message"] = $"Category '{category.Name}' created successfully.";
+            _context.Update(category);
+            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var activities = await _context.Activities
+                .Include(a => a.City)
+                .Include(a => a.Category)
+                .Where(a => a.CategoryId == id)
+                .ToListAsync();
+
+            ViewBag.CategoryName = (await _context.Categories.FindAsync(id))?.Name ?? "Unknown";
+            return View("CategoryActivities", activities);
         }
     }
 }

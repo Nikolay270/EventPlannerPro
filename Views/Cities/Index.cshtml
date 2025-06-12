@@ -1,9 +1,41 @@
 @model IEnumerable<EventPlannerPro.Models.City>
-<h2>List</h2>
-<a class="btn btn-success mb-2" href="/Cities/Create">Add City</a>
-<ul class="list-group">
-    @foreach (var item in Model)
-    {
-        <li class="list-group-item">@item.Name</li>
-    }
-</ul>
+@inject Microsoft.AspNetCore.Identity.UserManager<Microsoft.AspNetCore.Identity.IdentityUser> UserManager
+@inject Microsoft.AspNetCore.Identity.SignInManager<Microsoft.AspNetCore.Identity.IdentityUser> SignInManager
+
+@{
+    ViewData["Title"] = "Cities";
+    bool isAdmin = User.IsInRole("Admin");
+}
+
+<h2 class="mb-4">Cities</h2>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No cities found.</p>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var city in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm text-center">
+                    @if (!string.IsNullOrEmpty(city.PhotoUrl))
+                    {
+                        <img src="@city.PhotoUrl" class="card-img-top" alt="@city.Name" style="height: 200px; object-fit: cover;" />
+                    }
+
+                    <div class="card-body">
+                        <h5 class="card-title">@city.Name</h5>
+                        <a asp-controller="Activities" asp-action="ByCity" asp-route-cityId="@city.Id" class="btn btn-outline-primary mb-2">View Activities</a>
+
+                        @if (isAdmin)
+                        {
+                            <a asp-action="Edit" asp-route-id="@city.Id" class="btn btn-warning">Edit</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

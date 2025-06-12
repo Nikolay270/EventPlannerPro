@@ -1,0 +1,41 @@
+﻿@model IEnumerable<EventPlannerPro.Models.Activity>
+
+@{
+    ViewData["Title"] = "Activities in " + ViewBag.CityName;
+}
+
+<h2 class="mb-4">Activities in @ViewBag.CityName</h2>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">There are no activities in this city.</p>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        @foreach (var activity in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    @if (!string.IsNullOrEmpty(activity.PhotoUrl))
+                    {
+                        <img src="@activity.PhotoUrl" class="card-img-top" alt="@activity.Title" style="height: 200px; object-fit: cover;" />
+                    }
+
+                    <div class="card-body">
+                        <h5 class="card-title">@activity.Title</h5>
+                        <p class="card-text">@activity.Description</p>
+                        <p class="text-muted mb-1">
+                            <strong>Category:</strong> @activity.Category?.Name <br />
+                            <strong>Date:</strong> @activity.StartTime.ToString("dd MMM yyyy HH:mm")
+                        </p>
+                        <a asp-action="Details" asp-route-id="@activity.Id" class="btn btn-sm btn-outline-primary">View Details</a>
+                        <form asp-action="Join" asp-route-id="@activity.Id" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-success">Join</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

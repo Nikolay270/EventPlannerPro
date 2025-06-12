@@ -4,6 +4,7 @@ using EventPlannerPro.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventPlannerPro.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250612090706_AddPhotoUrlToCategory")]
+    partial class AddPhotoUrlToCategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -115,12 +117,26 @@ namespace EventPlannerPro.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PhotoUrl")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Cities");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Sofia"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Plovdiv"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Varna"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -152,15 +168,15 @@ namespace EventPlannerPro.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "a75bf879-a4e6-4702-8a14-2942cd95cc61",
-                            ConcurrencyStamp = "09388f69-74fc-47c2-b891-e4a1e4933f11",
+                            Id = "19edc50e-6732-46f7-a30c-17136350ebaf",
+                            ConcurrencyStamp = "54b871c8-e6a1-4a0b-816e-6b0ea5256621",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "67c279c6-008e-4faa-be32-6f37590046e3",
-                            ConcurrencyStamp = "13f23fc8-6b07-496b-895a-9f07d7e51277",
+                            Id = "71365c2a-59a6-4bd0-9567-cc7e9ab26e80",
+                            ConcurrencyStamp = "0fb1f92d-ac26-4e04-b257-dc6cd0b9e46c",
                             Name = "User",
                             NormalizedName = "USER"
                         });

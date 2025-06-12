@@ -1,0 +1,35 @@
+﻿@model EventPlannerPro.ViewModels.CategoryEditViewModel
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
+
+@{
+    ViewData["Title"] = "Edit Category";
+}
+
+@if (User.IsInRole("Admin"))
+{
+    <h2>Edit Category</h2>
+
+    <form asp-action="Edit">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-group">
+            <label asp-for="Name" class="control-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PhotoUrl" class="control-label"></label>
+            <input asp-for="PhotoUrl" class="form-control" />
+            <span asp-validation-for="PhotoUrl" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a asp-action="Index" class="btn btn-secondary">Back</a>
+    </form>
+}
+else
+{
+    <h3 class="text-danger">Access Denied</h3>
+}

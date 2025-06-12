@@ -1,0 +1,31 @@
+﻿@model IEnumerable<EventPlannerPro.Models.Activity>
+
+@{
+    ViewData["Title"] = "Activities in " + ViewBag.CityName;
+}
+
+<h2 class="text-center mb-4">Activities in @ViewBag.CityName</h2>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info text-center">No activities found in this city.</div>
+}
+else
+{
+    <div class="row">
+        @foreach (var activity in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card shadow-sm h-100">
+                    <img src="@activity.PhotoUrl" class="card-img-top" alt="Activity Image" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h5 class="card-title">@activity.Title</h5>
+                        <p class="card-text text-truncate">@activity.Description</p>
+                        <p><strong>Category:</strong> @activity.Category?.Name</p>
+                        <a href="@Url.Action("Details", "Activities", new { id = activity.Id })" class="btn btn-outline-primary">Details</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

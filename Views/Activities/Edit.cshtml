@@ -1,11 +1,17 @@
 ﻿@model EventPlannerPro.Models.Activity
+
 @{
     ViewData["Title"] = "Edit Activity";
 }
 
-<h2 class="mb-4">Edit Activity</h2>
+<h1>Edit Activity</h1>
 
-<form asp-action="Edit">
+<h4>Activity</h4>
+<hr />
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+
     <div class="form-group">
         <label asp-for="Title" class="control-label"></label>
         <input asp-for="Title" class="form-control" />
@@ -20,35 +26,47 @@
 
     <div class="form-group">
         <label asp-for="StartTime" class="control-label"></label>
-        <input asp-for="StartTime" class="form-control" type="datetime-local" />
+        <input asp-for="StartTime" type="datetime-local" class="form-control" />
         <span asp-validation-for="StartTime" class="text-danger"></span>
     </div>
 
     <div class="form-group">
         <label asp-for="EndTime" class="control-label"></label>
-        <input asp-for="EndTime" class="form-control" type="datetime-local" />
+        <input asp-for="EndTime" type="datetime-local" class="form-control" />
         <span asp-validation-for="EndTime" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="CityId" class="control-label">City</label>
-        <select asp-for="CityId" asp-items="ViewBag.CityId" class="form-control"></select>
+        <label asp-for="CityId" class="control-label"></label>
+        <select asp-for="CityId" class="form-control" asp-items="ViewBag.CityId"></select>
         <span asp-validation-for="CityId" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="CategoryId" class="control-label">Category</label>
-        <select asp-for="CategoryId" asp-items="ViewBag.CategoryId" class="form-control"></select>
+        <label asp-for="CategoryId" class="control-label"></label>
+        <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
         <span asp-validation-for="CategoryId" class="text-danger"></span>
     </div>
+
+    <div class="form-group">
+        <label asp-for="PhotoUrl" class="control-label">Image URL</label>
+        <input asp-for="PhotoUrl" class="form-control" placeholder="https://example.com/photo.jpg" />
+        <span asp-validation-for="PhotoUrl" class="text-danger"></span>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.PhotoUrl))
+    {
+        <div class="mb-3">
+            <strong>Current Image:</strong><br />
+            <img src="@Model.PhotoUrl" alt="Preview" style="max-width: 300px;" />
+        </div>
+    }
 
     <div class="form-group">
         <label asp-for="Description" class="control-label"></label>
         <textarea asp-for="Description" class="form-control"></textarea>
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
-
-    <input type="hidden" asp-for="Id" />
 
     <button type="submit" class="btn btn-primary">Save</button>
     <a asp-action="Index" class="btn btn-secondary">Back to List</a>

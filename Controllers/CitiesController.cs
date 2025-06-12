@@ -1,7 +1,10 @@
-using Microsoft.AspNetCore.Mvc;
 using EventPlannerPro.Data;
 using EventPlannerPro.Models;
-using EventPlannerPro.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace EventPlannerPro.Controllers
 {
@@ -14,31 +17,52 @@ namespace EventPlannerPro.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View(_context.Cities.ToList());
+            var cities = await _context.Cities.ToListAsync();
+            return View(cities);
         }
 
-        public IActionResult Create()
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Edit(int? id)
         {
-            return View(new CityCreateViewModel());
+            if (id == null) return NotFound();
+
+            var city = await _context.Cities.FindAsync(id);
+            if (city == null) return NotFound();
+
+            return View(city);
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(CityCreateViewModel model)
+        public async Task<IActionResult> Edit(int id, City city)
         {
-            if (!ModelState.IsValid)
+            if (id != city.Id) return NotFound();
+
+            if (ModelState.IsValid)
             {
-                return View(model);
+                _context.Update(city);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
             }
 
-            var city = new City { Name = model.Name.Trim() };
-            _context.Cities.Add(city);
-            _context.SaveChanges();
+            return View(city);
+        }
 
-            TempData["Message"] = $"City '{city.Name}' created successfully.";
-            return RedirectToAction(nameof(Index));
+        public async Task<IActionResult> ByCity(int cityId)
+        {
+            var activities = await _context.Activities
+                .Include(a => a.City)
+                .Include(a => a.Category)
+                .Where(a => a.CityId == cityId)
+                .ToListAsync();
+
+            var city = await _context.Cities.FindAsync(cityId);
+            ViewBag.CityName = city?.Name ?? "Unknown";
+
+            return View("ActivitiesByCity", activities);
         }
     }
 }

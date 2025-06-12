@@ -26,7 +26,7 @@ using (var scope = app.Services.CreateScope())
     var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
 
-    // Seed Roles
+   
     string[] roleNames = { "Admin", "Participant" };
     foreach (var role in roleNames)
     {
@@ -37,7 +37,7 @@ using (var scope = app.Services.CreateScope())
         }
     }
 
-    // Seed Admin User
+  
     var adminEmail = "tenev131@gmail.com";
     var adminPassword = "exvZux5u*#J7yCs";
 

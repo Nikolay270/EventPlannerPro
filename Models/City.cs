@@ -1,5 +1,3 @@
-
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace EventPlannerPro.Models
@@ -11,6 +9,9 @@ namespace EventPlannerPro.Models
         [Required]
         public string Name { get; set; }
 
-        public ICollection<Activity> Activities { get; set; }
+        [Display(Name = "Photo URL")]
+        public string? PhotoUrl { get; set; }
+
+        public ICollection<Activity>? Activities { get; set; }
     }
 }

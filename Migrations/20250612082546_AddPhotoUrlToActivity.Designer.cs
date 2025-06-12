@@ -4,6 +4,7 @@ using EventPlannerPro.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EventPlannerPro.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250612082546_AddPhotoUrlToActivity")]
+    partial class AddPhotoUrlToActivity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -95,12 +97,26 @@ namespace EventPlannerPro.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PhotoUrl")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Concert"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Festival"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Workshop"
+                        });
                 });
 
             modelBuilder.Entity("EventPlannerPro.Models.City", b =>
@@ -115,12 +131,26 @@ namespace EventPlannerPro.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PhotoUrl")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Cities");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Sofia"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Plovdiv"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Varna"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -152,15 +182,15 @@ namespace EventPlannerPro.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "a75bf879-a4e6-4702-8a14-2942cd95cc61",
-                            ConcurrencyStamp = "09388f69-74fc-47c2-b891-e4a1e4933f11",
+                            Id = "24ac5ab3-0053-4012-b052-31391b89c08b",
+                            ConcurrencyStamp = "6bebcfd5-daea-4d39-96c0-ddd2ffdc85e2",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "67c279c6-008e-4faa-be32-6f37590046e3",
-                            ConcurrencyStamp = "13f23fc8-6b07-496b-895a-9f07d7e51277",
+                            Id = "721d6bf3-da63-4fde-be24-ae7fb50ec0b8",
+                            ConcurrencyStamp = "bd568eb0-fc36-446b-8554-5194e02f8f6d",
                             Name = "User",
                             NormalizedName = "USER"
                         });

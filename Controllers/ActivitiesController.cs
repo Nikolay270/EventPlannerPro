@@ -24,20 +24,46 @@ namespace EventPlannerPro.Controllers
             _roleManager = roleManager;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchTitle, int? cityId, int? categoryId, DateTime? startDate)
         {
             var userId = _userManager.GetUserId(User);
+
             var joinedActivityIds = await _context.ActivityUsers
                 .Where(au => au.UserId == userId)
                 .Select(au => au.ActivityId)
                 .ToListAsync();
 
-            var activities = await _context.Activities
+            var query = _context.Activities
                 .Where(a => !joinedActivityIds.Contains(a.Id))
                 .Include(a => a.City)
                 .Include(a => a.Category)
-                .ToListAsync();
+                .AsQueryable();
 
+            if (!string.IsNullOrWhiteSpace(searchTitle))
+            {
+                query = query.Where(a => a.Title.Contains(searchTitle));
+            }
+
+            if (cityId.HasValue)
+            {
+                query = query.Where(a => a.CityId == cityId.Value);
+            }
+
+            if (categoryId.HasValue)
+            {
+                query = query.Where(a => a.CategoryId == categoryId.Value);
+            }
+
+            if (startDate.HasValue)
+            {
+                query = query.Where(a => a.StartTime.Date == startDate.Value.Date);
+            }
+
+            // These will be passed using ViewBag for filters
+            ViewBag.Cities = new SelectList(await _context.Cities.ToListAsync(), "Id", "Name");
+            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
+
+            var activities = await query.ToListAsync();
             return View(activities);
         }
 
@@ -156,7 +182,10 @@ namespace EventPlannerPro.Controllers
             var activity = await _context.Activities.FindAsync(id);
             if (activity == null) return NotFound();
 
-            if (activity.CreatorId != _userManager.GetUserId(User))
+            var userId = _userManager.GetUserId(User);
+            var isAdmin = User.IsInRole("Admin");
+
+            if (!isAdmin && activity.CreatorId != userId)
                 return Forbid();
 
             ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name", activity.CityId);
@@ -170,13 +199,17 @@ namespace EventPlannerPro.Controllers
         {
             if (id != activity.Id) return NotFound();
 
-            var existingActivity = await _context.Activities.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
-            if (existingActivity == null || existingActivity.CreatorId != _userManager.GetUserId(User))
+            var existing = await _context.Activities.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
+            var userId = _userManager.GetUserId(User);
+            var isAdmin = User.IsInRole("Admin");
+
+            if (existing == null || (!isAdmin && existing.CreatorId != userId))
                 return Forbid();
 
             if (ModelState.IsValid)
             {
-                activity.CreatorId = existingActivity.CreatorId;
+                activity.CreatorId = existing.CreatorId;
+
                 if (activity.Description != null)
                 {
                     activity.Description = activity.Description.TrimEnd('?', ' ');
@@ -192,6 +225,7 @@ namespace EventPlannerPro.Controllers
             return View(activity);
         }
 
+
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -199,9 +233,12 @@ namespace EventPlannerPro.Controllers
             var activity = await _context.Activities
                 .Include(a => a.City)
                 .Include(a => a.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(a => a.Id == id);
 
-            if (activity == null || activity.CreatorId != _userManager.GetUserId(User))
+            var userId = _userManager.GetUserId(User);
+            var isAdmin = User.IsInRole("Admin");
+
+            if (activity == null || (!isAdmin && activity.CreatorId != userId))
                 return Forbid();
 
             return View(activity);
@@ -212,12 +249,42 @@ namespace EventPlannerPro.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var activity = await _context.Activities.FindAsync(id);
-            if (activity.CreatorId != _userManager.GetUserId(User))
+            var userId = _userManager.GetUserId(User);
+            var isAdmin = User.IsInRole("Admin");
+
+            if (activity == null || (!isAdmin && activity.CreatorId != userId))
                 return Forbid();
 
             _context.Activities.Remove(activity);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+        public async Task<IActionResult> ByCategory(int categoryId)
+        {
+            var activities = await _context.Activities
+                .Include(a => a.Category)
+                .Include(a => a.City)
+                .Where(a => a.CategoryId == categoryId)
+                .ToListAsync();
+
+            var category = await _context.Categories.FindAsync(categoryId);
+            ViewBag.CategoryName = category?.Name ?? "Unknown";
+
+            return View("ActivitiesByCategory", activities);
+        }
+        public async Task<IActionResult> ByCity(int cityId)
+        {
+            var activities = await _context.Activities
+                .Include(a => a.Category)
+                .Include(a => a.City)
+                .Where(a => a.CityId == cityId)
+                .ToListAsync();
+
+            var city = await _context.Cities.FindAsync(cityId);
+            ViewBag.CityName = city?.Name ?? "Unknown";
+
+            return View("ActivitiesByCity", activities);
+        }
+
     }
 }

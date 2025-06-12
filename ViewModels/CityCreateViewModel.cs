@@ -6,5 +6,7 @@ namespace EventPlannerPro.ViewModels
     {
         [Required(ErrorMessage = "City name is required.")]
         public string Name { get; set; } = string.Empty;
+
+        public string? PhotoUrl { get; set; }
     }
 }

@@ -36,5 +36,10 @@ namespace EventPlannerPro.Models
         public string? Description { get; set; }
 
         public ICollection<ActivityUser> Participants { get; set; } = new List<ActivityUser>();
+
+        [Display(Name = "Photo URL")]
+        [Url]
+        public string? PhotoUrl { get; set; }
+
     }
 }

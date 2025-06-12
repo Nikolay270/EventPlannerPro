@@ -1,0 +1,42 @@
+@model IEnumerable<EventPlannerPro.Models.Category>
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
+
+@{
+    ViewData["Title"] = "All Categories";
+}
+
+<h1 class="text-center mb-4">Browse Categories</h1>
+
+@if (User.IsInRole("Admin"))
+{
+    <div class="mb-3">
+        <a asp-action="Create" class="btn btn-success">Create New Category</a>
+    </div>
+}
+
+<div class="row">
+    @foreach (var category in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow text-center">
+                @if (!string.IsNullOrEmpty(category.PhotoUrl))
+                {
+                    <img src="@category.PhotoUrl" class="card-img-top" style="height: 250px; object-fit: cover;" alt="@category.Name image" />
+                }
+
+                <div class="card-body">
+                    <h4 class="card-title">@category.Name</h4>
+
+                    <a asp-controller="Activities" asp-action="ByCategory" asp-route-categoryId="@category.Id" class="btn btn-primary mb-2">View Activities</a>
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <a asp-action="Edit" asp-route-id="@category.Id" class="btn btn-outline-secondary">Edit</a>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>

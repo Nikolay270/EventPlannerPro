@@ -32,18 +32,10 @@ namespace EventPlannerPro.Data
             );
 
             // Cities
-            builder.Entity<City>().HasData(
-                new City { Id = 1, Name = "Sofia" },
-                new City { Id = 2, Name = "Plovdiv" },
-                new City { Id = 3, Name = "Varna" }
-            );
+            builder.Entity<City>();
 
             // Categories
-            builder.Entity<Category>().HasData(
-                new Category { Id = 1, Name = "Concert" },
-                new Category { Id = 2, Name = "Festival" },
-                new Category { Id = 3, Name = "Workshop" }
-            );
+            builder.Entity<Category>();
 
             builder.Entity<ActivityUser>()
                .HasKey(au => new { au.UserId, au.ActivityId });

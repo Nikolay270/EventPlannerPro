@@ -1,50 +1,81 @@
 @model IEnumerable<EventPlannerPro.Models.Activity>
-@using Microsoft.AspNetCore.Identity
-@inject UserManager<IdentityUser> UserManager
-@inject SignInManager<IdentityUser> SignInManager
+@using Microsoft.AspNetCore.Mvc.Rendering
 
 @{
     ViewData["Title"] = "All Activities";
-    var userId = UserManager.GetUserId(User);
 }
 
-<h1>All Activities</h1>
+<h2 class="mb-4">All Activities</h2>
 
-<p>
-    <a class="btn btn-primary" asp-controller="Activities" asp-action="Create">Create New</a>
-</p>
+<div class="mb-4">
+    <a asp-action="Create" class="btn btn-success">Create New Activity</a>
+</div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Place</th>
-            <th>Start Time</th>
-            <th>End Time</th>
-            <th>City</th>
-            <th>Category</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
+<form asp-action="Index" method="get" class="row g-3 mb-4">
+    <div class="col-md-3">
+        <input type="text" name="searchTitle" placeholder="Search by title" class="form-control" />
+    </div>
+
+    <div class="col-md-3">
+        <select name="cityId" class="form-select">
+            <option value="">All Cities</option>
+            @foreach (var city in ViewBag.Cities as SelectList)
+            {
+                <option value="@city.Value">@city.Text</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <select name="categoryId" class="form-select">
+            <option value="">All Categories</option>
+            @foreach (var category in ViewBag.Categories as SelectList)
+            {
+                <option value="@category.Value">@category.Text</option>
+            }
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <input type="date" name="startDate" class="form-control" />
+    </div>
+
+    <div class="col-md-1">
+        <button type="submit" class="btn btn-primary w-100">Filter</button>
+    </div>
+</form>
+
+@if (!Model.Any())
+{
+    <p class="text-muted">No activities found. Try adjusting the filters above.</p>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        @foreach (var activity in Model)
         {
-            <tr>
-                <td>@item.Title</td>
-                <td>@item.Place</td>
-                <td>@item.StartTime</td>
-                <td>@item.EndTime</td>
-                <td>@item.City?.Name</td>
-                <td>@item.Category?.Name</td>
-                <td>
-                    <a class="btn btn-info" asp-action="Details" asp-route-id="@item.Id">Details</a>
-                    @if (item.CreatorId == userId)
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    @if (!string.IsNullOrEmpty(activity.PhotoUrl))
                     {
-                        <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
-                        <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        <img src="@activity.PhotoUrl" class="card-img-top" alt="@activity.Title" style="height: 200px; object-fit: cover;" />
                     }
-                </td>
-            </tr>
+
+                    <div class="card-body">
+                        <h5 class="card-title">@activity.Title</h5>
+                        <p class="card-text">@activity.Description</p>
+                        <p class="text-muted mb-1">
+                            <strong>City:</strong> @activity.City?.Name <br />
+                            <strong>Category:</strong> @activity.Category?.Name <br />
+                            <strong>Date:</strong> @activity.StartTime.ToString("dd MMM yyyy HH:mm")
+                        </p>
+                        <a asp-action="Details" asp-route-id="@activity.Id" class="btn btn-sm btn-outline-primary">View Details</a>
+                        <form asp-action="Join" asp-route-id="@activity.Id" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-success">Join</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
         }
-    </tbody>
-</table>
+    </div>
+}
