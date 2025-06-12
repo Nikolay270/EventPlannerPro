@@ -36,7 +36,7 @@ namespace EventPlannerPro.Migrations
                     b.Property<int>("CityId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CreatedById")
+                    b.Property<string>("CreatorId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
@@ -177,15 +177,15 @@ namespace EventPlannerPro.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "05d3a7e6-c943-4bbf-a098-c664fae7620b",
-                            ConcurrencyStamp = "a795089f-14a4-4551-b8c4-aabc641904d7",
+                            Id = "1ec4587a-8fde-4782-b63b-6c6650fcfa08",
+                            ConcurrencyStamp = "b769e231-3a89-48b7-ab36-036829941adf",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "9d6497c2-e2b6-4d41-8ad4-49bf04aced19",
-                            ConcurrencyStamp = "bbd16697-152c-45f1-a50e-bc2a095345b5",
+                            Id = "75b9d2a1-5cd8-429d-9fed-46cec0023ca2",
+                            ConcurrencyStamp = "5d947144-31e4-42fb-936a-e3d41fcc5441",
                             Name = "User",
                             NormalizedName = "USER"
                         });

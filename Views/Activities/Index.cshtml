@@ -5,6 +5,7 @@
 
 @{
     ViewData["Title"] = "All Activities";
+    var userId = UserManager.GetUserId(User);
 }
 
 <h1>All Activities</h1>
@@ -37,13 +38,7 @@
                 <td>@item.Category?.Name</td>
                 <td>
                     <a class="btn btn-info" asp-action="Details" asp-route-id="@item.Id">Details</a>
-                    @if (SignInManager.IsSignedIn(User))
-                    {
-                        <form asp-action="Join" asp-route-id="@item.Id" method="post" style="display:inline">
-                            <button type="submit" class="btn btn-success">Join</button>
-                        </form>
-                    }
-                    @if (User.IsInRole("Admin"))
+                    @if (item.CreatorId == userId)
                     {
                         <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
                         <a class="btn btn-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a>

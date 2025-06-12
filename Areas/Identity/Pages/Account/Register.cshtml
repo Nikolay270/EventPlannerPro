@@ -9,7 +9,7 @@
 <div class="row">
     <div class="col-md-6">
         <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
-            <!-- Removed asp-validation-summary -->
+       
 
             <div class="form-group">
                 <label asp-for="Input.Email"></label>
@@ -34,7 +34,7 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        // Log any field-level validation issues to the console
+        
         const errors = document.querySelectorAll(".text-danger");
         errors.forEach(e => {
             if (e.textContent.trim()) {

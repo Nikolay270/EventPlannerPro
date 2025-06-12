@@ -41,7 +41,6 @@ namespace EventPlannerPro.Controllers
             return View(activities);
         }
 
-        [Authorize]
         public async Task<IActionResult> JoinedActivities()
         {
             var userId = _userManager.GetUserId(User);
@@ -59,125 +58,166 @@ namespace EventPlannerPro.Controllers
             return View(activities);
         }
 
-        public async Task<IActionResult> Details(int id)
-        {
-            var activity = await _context.Activities
-                .Include(a => a.City)
-                .Include(a => a.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (activity == null)
-            {
-                return NotFound();
-            }
-
-            return View(activity);
-        }
-
-        [Authorize(Roles = "Admin")]
-        public IActionResult Create()
-        {
-            ViewData["CityId"] = new SelectList(_context.Cities.ToList(), "Id", "Name");
-            ViewData["CategoryId"] = new SelectList(_context.Categories.ToList(), "Id", "Name");
-            return View();
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create(Activity activity)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(activity);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-
-            ViewData["CityId"] = new SelectList(_context.Cities.ToList(), "Id", "Name", activity.CityId);
-            ViewData["CategoryId"] = new SelectList(_context.Categories.ToList(), "Id", "Name", activity.CategoryId);
-            return View(activity);
-        }
-
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id)
-        {
-            var activity = await _context.Activities.FindAsync(id);
-            if (activity == null)
-            {
-                return NotFound();
-            }
-
-            ViewData["CityId"] = new SelectList(_context.Cities.ToList(), "Id", "Name", activity.CityId);
-            ViewData["CategoryId"] = new SelectList(_context.Categories.ToList(), "Id", "Name", activity.CategoryId);
-            return View(activity);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(int id, Activity activity)
-        {
-            if (id != activity.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(activity);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!_context.Activities.Any(e => e.Id == activity.Id))
-                    {
-                        return NotFound();
-                    }
-                    throw;
-                }
-                return RedirectToAction(nameof(Index));
-            }
-
-            ViewData["CityId"] = new SelectList(_context.Cities.ToList(), "Id", "Name", activity.CityId);
-            ViewData["CategoryId"] = new SelectList(_context.Categories.ToList(), "Id", "Name", activity.CategoryId);
-            return View(activity);
-        }
-
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var activity = await _context.Activities.FindAsync(id);
-            if (activity == null)
-            {
-                return NotFound();
-            }
-
-            _context.Activities.Remove(activity);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        [HttpPost]
-        [Authorize]
         public async Task<IActionResult> Join(int id)
         {
             var userId = _userManager.GetUserId(User);
 
-            if (!_context.ActivityUsers.Any(au => au.UserId == userId && au.ActivityId == id))
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var alreadyJoined = await _context.ActivityUsers
+                .AnyAsync(au => au.UserId == userId && au.ActivityId == id);
+
+            if (!alreadyJoined)
             {
                 var join = new ActivityUser
                 {
                     UserId = userId,
                     ActivityId = id
                 };
+
                 _context.ActivityUsers.Add(join);
                 await _context.SaveChangesAsync();
             }
 
             return RedirectToAction("JoinedActivities");
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Leave(int id)
+        {
+            var userId = _userManager.GetUserId(User);
+
+            if (string.IsNullOrEmpty(userId))
+                return Unauthorized();
+
+            var activityUser = await _context.ActivityUsers
+                .FirstOrDefaultAsync(au => au.UserId == userId && au.ActivityId == id);
+
+            if (activityUser != null)
+            {
+                _context.ActivityUsers.Remove(activityUser);
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction("Index");
+        }
+
+
+        public IActionResult Create()
+        {
+            ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name");
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Activity activity)
+        {
+            if (ModelState.IsValid)
+            {
+                activity.CreatorId = _userManager.GetUserId(User);
+                if (activity.Description != null)
+                {
+                    activity.Description = activity.Description.TrimEnd('?', ' ');
+                }
+
+                _context.Add(activity);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+
+            ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name", activity.CityId);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", activity.CategoryId);
+            return View(activity);
+        }
+
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var activity = await _context.Activities
+                .Include(a => a.City)
+                .Include(a => a.Category)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (activity == null) return NotFound();
+
+            return View(activity);
+        }
+
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var activity = await _context.Activities.FindAsync(id);
+            if (activity == null) return NotFound();
+
+            if (activity.CreatorId != _userManager.GetUserId(User))
+                return Forbid();
+
+            ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name", activity.CityId);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", activity.CategoryId);
+            return View(activity);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Activity activity)
+        {
+            if (id != activity.Id) return NotFound();
+
+            var existingActivity = await _context.Activities.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
+            if (existingActivity == null || existingActivity.CreatorId != _userManager.GetUserId(User))
+                return Forbid();
+
+            if (ModelState.IsValid)
+            {
+                activity.CreatorId = existingActivity.CreatorId;
+                if (activity.Description != null)
+                {
+                    activity.Description = activity.Description.TrimEnd('?', ' ');
+                }
+
+                _context.Update(activity);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+
+            ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name", activity.CityId);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", activity.CategoryId);
+            return View(activity);
+        }
+
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var activity = await _context.Activities
+                .Include(a => a.City)
+                .Include(a => a.Category)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (activity == null || activity.CreatorId != _userManager.GetUserId(User))
+                return Forbid();
+
+            return View(activity);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var activity = await _context.Activities.FindAsync(id);
+            if (activity.CreatorId != _userManager.GetUserId(User))
+                return Forbid();
+
+            _context.Activities.Remove(activity);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
     }
 }

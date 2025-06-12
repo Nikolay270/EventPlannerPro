@@ -4,6 +4,7 @@
 
 @{
     ViewData["Title"] = "Activity Details";
+    var userId = UserManager.GetUserId(User);
 }
 
 <h1>Activity Details</h1>
@@ -14,27 +15,35 @@
     <dl class="row">
         <dt class="col-sm-2">Place</dt>
         <dd class="col-sm-10">@Model.Place</dd>
+
         <dt class="col-sm-2">Start Time</dt>
-        <dd class="col-sm-10">@Model.StartTime</dd>
+        <dd class="col-sm-10">@Model.StartTime.ToString("g")</dd>
+
         <dt class="col-sm-2">End Time</dt>
-        <dd class="col-sm-10">@Model.EndTime</dd>
+        <dd class="col-sm-10">@Model.EndTime.ToString("g")</dd>
+
         <dt class="col-sm-2">City</dt>
         <dd class="col-sm-10">@Model.City?.Name</dd>
+
         <dt class="col-sm-2">Category</dt>
         <dd class="col-sm-10">@Model.Category?.Name</dd>
+
         <dt class="col-sm-2">Description</dt>
-        <dd class="col-sm-10">@Model.Description?</dd>
+        <dd class="col-sm-10">@Model.Description</dd>
     </dl>
 </div>
+
 <div>
     <a class="btn btn-secondary" asp-action="Index">Back to List</a>
+
     @if (SignInManager.IsSignedIn(User))
     {
         <form asp-action="Join" asp-route-id="@Model.Id" method="post" style="display:inline">
             <button type="submit" class="btn btn-success">Join Activity</button>
         </form>
     }
-    @if (User.IsInRole("Admin"))
+
+    @if (User.IsInRole("Admin") || Model.CreatorId == userId)
     {
         <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
         <a class="btn btn-danger" asp-action="Delete" asp-route-id="@Model.Id">Delete</a>

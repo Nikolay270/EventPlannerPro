@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<EventPlannerPro.Models.Activity>
+
 @{
     ViewData["Title"] = "Joined Activities";
 }
@@ -8,31 +9,39 @@
 @if (!Model.Any())
 {
     <div class="alert alert-info">
-        You haven't joined any activities yet. <a asp-action="Create">Create one now</a>!
+        You haven't joined any activities yet. <a asp-action="Create" class="alert-link">Create one now</a>!
     </div>
 }
 else
 {
-    <table class="table table-striped">
-        <thead>
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
             <tr>
                 <th>Title</th>
+                <th>Place</th>
                 <th>City</th>
+                <th>Category</th>
                 <th>Start Time</th>
                 <th>End Time</th>
                 <th>Actions</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
+            @foreach (var activity in Model)
             {
                 <tr>
-                    <td>@item.Title</td>
-                    <td>@item.City?.Name</td>
-                    <td>@item.StartTime.ToString("g")</td>
-                    <td>@item.EndTime.ToString("g")</td>
+                    <td>@activity.Title</td>
+                    <td>@activity.Place</td>
+                    <td>@activity.City?.Name</td>
+                    <td>@activity.Category?.Name</td>
+                    <td>@activity.StartTime.ToString("g")</td>
+                    <td>@activity.EndTime.ToString("g")</td>
                     <td>
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a>
+                        <a asp-action="Details" asp-route-id="@activity.Id" class="btn btn-sm btn-info">Details</a>
+
+                        <form asp-action="Leave" asp-route-id="@activity.Id" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-danger">Leave</button>
+                        </form>
                     </td>
                 </tr>
             }
