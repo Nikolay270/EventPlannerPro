@@ -36,16 +36,18 @@ namespace EventPlannerPro.Migrations
                     b.Property<int>("CityId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CreatorId")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("OrganizerId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("PhotoUrl")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Place")
@@ -57,13 +59,16 @@ namespace EventPlannerPro.Migrations
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("CityId");
+
+                    b.HasIndex("OrganizerId");
 
                     b.ToTable("Activities");
                 });
@@ -123,6 +128,42 @@ namespace EventPlannerPro.Migrations
                     b.ToTable("Cities");
                 });
 
+            modelBuilder.Entity("EventPlannerPro.Models.OrganizerReview", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Comment")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("OrganizerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ReviewerId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganizerId");
+
+                    b.HasIndex("ReviewerId");
+
+                    b.ToTable("OrganizerReviews");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -148,22 +189,6 @@ namespace EventPlannerPro.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "a75bf879-a4e6-4702-8a14-2942cd95cc61",
-                            ConcurrencyStamp = "09388f69-74fc-47c2-b891-e4a1e4933f11",
-                            Name = "Admin",
-                            NormalizedName = "ADMIN"
-                        },
-                        new
-                        {
-                            Id = "67c279c6-008e-4faa-be32-6f37590046e3",
-                            ConcurrencyStamp = "13f23fc8-6b07-496b-895a-9f07d7e51277",
-                            Name = "User",
-                            NormalizedName = "USER"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -355,9 +380,16 @@ namespace EventPlannerPro.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Organizer")
+                        .WithMany()
+                        .HasForeignKey("OrganizerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Category");
 
                     b.Navigation("City");
+
+                    b.Navigation("Organizer");
                 });
 
             modelBuilder.Entity("EventPlannerPro.Models.ActivityUser", b =>
@@ -377,6 +409,25 @@ namespace EventPlannerPro.Migrations
                     b.Navigation("Activity");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EventPlannerPro.Models.OrganizerReview", b =>
+                {
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Organizer")
+                        .WithMany()
+                        .HasForeignKey("OrganizerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Reviewer")
+                        .WithMany()
+                        .HasForeignKey("ReviewerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Organizer");
+
+                    b.Navigation("Reviewer");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

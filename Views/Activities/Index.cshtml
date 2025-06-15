@@ -1,8 +1,14 @@
 @model IEnumerable<EventPlannerPro.Models.Activity>
-@using Microsoft.AspNetCore.Mvc.Rendering
+@using EventPlannerPro.Models
 
 @{
     ViewData["Title"] = "All Activities";
+    var cities = ViewBag.Cities as IEnumerable<City>;
+    var categories = ViewBag.Categories as IEnumerable<Category>;
+    var qTitle = Context.Request.Query["searchTitle"];
+    var qCity = Context.Request.Query["cityId"];
+    var qCategory = Context.Request.Query["categoryId"];
+    var qDate = Context.Request.Query["date"];
 }
 
 <h2 class="mb-4">All Activities</h2>
@@ -11,68 +17,65 @@
     <a asp-action="Create" class="btn btn-success">Create New Activity</a>
 </div>
 
-<form asp-action="Index" method="get" class="row g-3 mb-4">
-    <div class="col-md-3">
-        <input type="text" name="searchTitle" placeholder="Search by title" class="form-control" />
+<form asp-action="Index" method="get" class="row gy-2 gx-2 mb-4">
+    <div class="col-12 col-md-3">
+        <input type="text" name="searchTitle" value="@qTitle" placeholder="Search by title" class="form-control" />
     </div>
-
-    <div class="col-md-3">
+    <div class="col-6 col-md-2">
         <select name="cityId" class="form-select">
             <option value="">All Cities</option>
-            @foreach (var city in ViewBag.Cities as SelectList)
+            @foreach (var c in cities ?? Enumerable.Empty<City>())
             {
-                <option value="@city.Value">@city.Text</option>
+                <option value="@c.Id" selected="@(qCity == c.Id.ToString())">@c.Name</option>
             }
         </select>
     </div>
-
-    <div class="col-md-3">
+    <div class="col-6 col-md-2">
         <select name="categoryId" class="form-select">
             <option value="">All Categories</option>
-            @foreach (var category in ViewBag.Categories as SelectList)
+            @foreach (var cat in categories ?? Enumerable.Empty<Category>())
             {
-                <option value="@category.Value">@category.Text</option>
+                <option value="@cat.Id" selected="@(qCategory == cat.Id.ToString())">@cat.Name</option>
             }
         </select>
     </div>
-
-    <div class="col-md-2">
-        <input type="date" name="startDate" class="form-control" />
+    <div class="col-6 col-md-2">
+        <input type="date" name="date" value="@qDate" class="form-control" />
     </div>
-
-    <div class="col-md-1">
-        <button type="submit" class="btn btn-primary w-100">Filter</button>
+    <div class="col-6 col-md-1 d-grid">
+        <button type="submit" class="btn btn-primary">Filter</button>
     </div>
 </form>
 
 @if (!Model.Any())
 {
-    <p class="text-muted">No activities found. Try adjusting the filters above.</p>
+    <p class="text-muted">No activities found.</p>
 }
 else
 {
-    <div class="row row-cols-1 row-cols-md-2 g-4">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         @foreach (var activity in Model)
         {
             <div class="col">
                 <div class="card h-100 shadow-sm">
                     @if (!string.IsNullOrEmpty(activity.PhotoUrl))
                     {
-                        <img src="@activity.PhotoUrl" class="card-img-top" alt="@activity.Title" style="height: 200px; object-fit: cover;" />
+                        <img src="@activity.PhotoUrl" alt="@activity.Title" class="card-img-top" style="height:240px;object-fit:cover;" />
                     }
-
-                    <div class="card-body">
+                    <div class="card-body d-flex flex-column">
                         <h5 class="card-title">@activity.Title</h5>
                         <p class="card-text">@activity.Description</p>
-                        <p class="text-muted mb-1">
-                            <strong>City:</strong> @activity.City?.Name <br />
-                            <strong>Category:</strong> @activity.Category?.Name <br />
+                        <p class="card-text">
+                            <strong>City:</strong> @activity.City?.Name<br />
+                            <strong>Category:</strong> @activity.Category?.Name<br />
                             <strong>Date:</strong> @activity.StartTime.ToString("dd MMM yyyy HH:mm")
                         </p>
-                        <a asp-action="Details" asp-route-id="@activity.Id" class="btn btn-sm btn-outline-primary">View Details</a>
-                        <form asp-action="Join" asp-route-id="@activity.Id" method="post" class="d-inline">
-                            <button type="submit" class="btn btn-sm btn-success">Join</button>
-                        </form>
+                        <div class="d-flex justify-content-center gap-2 mt-auto">
+                            <a asp-action="Details" asp-route-id="@activity.Id" class="btn btn-outline-primary btn-sm">View Details</a>
+                            <form asp-action="Join" asp-route-id="@activity.Id" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-success btn-sm">Join</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>

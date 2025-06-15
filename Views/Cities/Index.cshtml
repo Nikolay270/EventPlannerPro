@@ -1,13 +1,20 @@
 @model IEnumerable<EventPlannerPro.Models.City>
-@inject Microsoft.AspNetCore.Identity.UserManager<Microsoft.AspNetCore.Identity.IdentityUser> UserManager
-@inject Microsoft.AspNetCore.Identity.SignInManager<Microsoft.AspNetCore.Identity.IdentityUser> SignInManager
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
 
 @{
-    ViewData["Title"] = "Cities";
+    ViewData["Title"] = "Browse Cities";
     bool isAdmin = User.IsInRole("Admin");
 }
 
-<h2 class="mb-4">Cities</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">Browse Cities</h2>
+    @if (isAdmin)
+    {
+        <a asp-action="Create" class="btn btn-success fw-semibold">Create New City</a>
+    }
+</div>
 
 @if (!Model.Any())
 {
@@ -22,13 +29,11 @@ else
                 <div class="card h-100 shadow-sm text-center">
                     @if (!string.IsNullOrEmpty(city.PhotoUrl))
                     {
-                        <img src="@city.PhotoUrl" class="card-img-top" alt="@city.Name" style="height: 200px; object-fit: cover;" />
+                        <img src="@city.PhotoUrl" alt="@city.Name" class="card-img-top" style="height:200px;object-fit:cover;" />
                     }
-
-                    <div class="card-body">
+                    <div class="card-body d-flex flex-column">
                         <h5 class="card-title">@city.Name</h5>
                         <a asp-controller="Activities" asp-action="ByCity" asp-route-cityId="@city.Id" class="btn btn-outline-primary mb-2">View Activities</a>
-
                         @if (isAdmin)
                         {
                             <a asp-action="Edit" asp-route-id="@city.Id" class="btn btn-warning">Edit</a>

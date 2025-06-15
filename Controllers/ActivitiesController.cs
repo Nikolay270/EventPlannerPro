@@ -1,137 +1,137 @@
-﻿using EventPlannerPro.Data;
-using EventPlannerPro.Models;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Security.Claims;
-using System.Threading.Tasks;
+using EventPlannerPro.Data;
+using EventPlannerPro.Models;
+using EventPlannerPro.ViewModels;
 
 namespace EventPlannerPro.Controllers
 {
+    [Authorize]
     public class ActivitiesController : Controller
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public ActivitiesController(ApplicationDbContext context, UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+        public ActivitiesController(ApplicationDbContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
             _userManager = userManager;
-            _roleManager = roleManager;
         }
 
-        public async Task<IActionResult> Index(string searchTitle, int? cityId, int? categoryId, DateTime? startDate)
+        public async Task<IActionResult> Index(string searchTitle, int? cityId, int? categoryId, string date)
         {
-            var userId = _userManager.GetUserId(User);
-
-            var joinedActivityIds = await _context.ActivityUsers
-                .Where(au => au.UserId == userId)
-                .Select(au => au.ActivityId)
-                .ToListAsync();
-
             var query = _context.Activities
-                .Where(a => !joinedActivityIds.Contains(a.Id))
-                .Include(a => a.City)
-                .Include(a => a.Category)
-                .AsQueryable();
+                                .Include(a => a.City)
+                                .Include(a => a.Category)
+                                .AsQueryable();
+
+            var userId = _userManager.GetUserId(User);
+            if (!string.IsNullOrEmpty(userId))
+                query = query.Where(a => !a.Participants.Any(p => p.UserId == userId));
 
             if (!string.IsNullOrWhiteSpace(searchTitle))
-            {
                 query = query.Where(a => a.Title.Contains(searchTitle));
-            }
 
             if (cityId.HasValue)
-            {
-                query = query.Where(a => a.CityId == cityId.Value);
-            }
+                query = query.Where(a => a.CityId == cityId);
 
             if (categoryId.HasValue)
-            {
-                query = query.Where(a => a.CategoryId == categoryId.Value);
-            }
+                query = query.Where(a => a.CategoryId == categoryId);
 
-            if (startDate.HasValue)
-            {
-                query = query.Where(a => a.StartTime.Date == startDate.Value.Date);
-            }
+            if (!string.IsNullOrWhiteSpace(date) && DateOnly.TryParse(date, out var d))
+                query = query.Where(a => a.StartTime.Date == d.ToDateTime(TimeOnly.MinValue).Date);
 
-            // These will be passed using ViewBag for filters
-            ViewBag.Cities = new SelectList(await _context.Cities.ToListAsync(), "Id", "Name");
-            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "Id", "Name");
-
-            var activities = await query.ToListAsync();
-            return View(activities);
+            ViewBag.Cities = await _context.Cities.ToListAsync();
+            ViewBag.Categories = await _context.Categories.ToListAsync();
+            return View(await query.ToListAsync());
         }
 
-        public async Task<IActionResult> JoinedActivities()
+        public async Task<IActionResult> ByCity(int? cityId)
         {
-            var userId = _userManager.GetUserId(User);
-            var joinedActivityIds = await _context.ActivityUsers
-                .Where(au => au.UserId == userId)
-                .Select(au => au.ActivityId)
-                .ToListAsync();
-
-            var activities = await _context.Activities
-                .Where(a => joinedActivityIds.Contains(a.Id))
-                .Include(a => a.City)
-                .Include(a => a.Category)
-                .ToListAsync();
-
-            return View(activities);
+            if (cityId == null) return NotFound();
+            var list = await _context.Activities
+                                     .Include(a => a.City)
+                                     .Include(a => a.Category)
+                                     .Where(a => a.CityId == cityId)
+                                     .ToListAsync();
+            ViewBag.Cities = await _context.Cities.ToListAsync();
+            ViewBag.Categories = await _context.Categories.ToListAsync();
+            return View("Index", list);
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ByCategory(int? categoryId)
+        {
+            if (categoryId == null) return NotFound();
+            var list = await _context.Activities
+                                     .Include(a => a.City)
+                                     .Include(a => a.Category)
+                                     .Where(a => a.CategoryId == categoryId)
+                                     .ToListAsync();
+            ViewBag.Cities = await _context.Cities.ToListAsync();
+            ViewBag.Categories = await _context.Categories.ToListAsync();
+            return View("Index", list);
+        }
+
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+            var activity = await _context.Activities
+                                         .Include(a => a.City)
+                                         .Include(a => a.Category)
+                                         .FirstOrDefaultAsync(a => a.Id == id);
+            return activity == null ? NotFound() : View(activity);
+        }
+
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Join(int id)
         {
             var userId = _userManager.GetUserId(User);
+            var activity = await _context.Activities.Include(a => a.Participants).FirstOrDefaultAsync(a => a.Id == id);
+            if (activity == null) return NotFound();
 
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
-
-            var alreadyJoined = await _context.ActivityUsers
-                .AnyAsync(au => au.UserId == userId && au.ActivityId == id);
-
-            if (!alreadyJoined)
+            if (!activity.Participants.Any(p => p.UserId == userId))
             {
-                var join = new ActivityUser
-                {
-                    UserId = userId,
-                    ActivityId = id
-                };
-
-                _context.ActivityUsers.Add(join);
+                activity.Participants.Add(new ActivityUser { ActivityId = id, UserId = userId });
                 await _context.SaveChangesAsync();
             }
-
-            return RedirectToAction("JoinedActivities");
+            return RedirectToAction(nameof(Joined));
         }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Leave(int id)
         {
             var userId = _userManager.GetUserId(User);
+            var activity = await _context.Activities.Include(a => a.Participants).FirstOrDefaultAsync(a => a.Id == id);
+            if (activity == null) return NotFound();
 
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized();
-
-            var activityUser = await _context.ActivityUsers
-                .FirstOrDefaultAsync(au => au.UserId == userId && au.ActivityId == id);
-
-            if (activityUser != null)
+            var link = activity.Participants.FirstOrDefault(p => p.UserId == userId);
+            if (link != null)
             {
-                _context.ActivityUsers.Remove(activityUser);
+                activity.Participants.Remove(link);
                 await _context.SaveChangesAsync();
             }
+            return RedirectToAction(nameof(Joined));
+        }
 
-            return RedirectToAction("Index");
+        public async Task<IActionResult> Joined()
+        {
+            var userId = _userManager.GetUserId(User);
+            var list = await _context.Activities
+                                     .Include(a => a.City)
+                                     .Include(a => a.Category)
+                                     .Include(a => a.Participants)
+                                     .Where(a => a.Participants.Any(p => p.UserId == userId))
+                                     .ToListAsync();
+            return View("JoinedActivities", list);
         }
 
 
+        [Authorize]
         public IActionResult Create()
         {
             ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name");
@@ -139,152 +139,70 @@ namespace EventPlannerPro.Controllers
             return View();
         }
 
+        [Authorize]
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Activity activity)
+        [IgnoreAntiforgeryToken]               
+        public async Task<IActionResult> Create([Bind("Title,Description,Place,StartTime,EndTime,CityId,CategoryId,PhotoUrl")] Activity a)
         {
-            if (ModelState.IsValid)
+            if (a.CityId == 0 || a.CategoryId == 0 || string.IsNullOrWhiteSpace(a.Title))
             {
-                activity.CreatorId = _userManager.GetUserId(User);
-                if (activity.Description != null)
-                {
-                    activity.Description = activity.Description.TrimEnd('?', ' ');
-                }
-
-                _context.Add(activity);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("", "Title, City and Category are mandatory.");
+                ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name", a.CityId);
+                ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", a.CategoryId);
+                return View(a);
             }
 
-            ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name", activity.CityId);
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", activity.CategoryId);
-            return View(activity);
+            a.OrganizerId = _userManager.GetUserId(User);
+            _context.Add(a);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var activity = await _context.Activities
-                .Include(a => a.City)
-                .Include(a => a.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (activity == null) return NotFound();
-
-            return View(activity);
-        }
-
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
-
-            var activity = await _context.Activities.FindAsync(id);
+            var activity = await _context.Activities.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
             if (activity == null) return NotFound();
 
-            var userId = _userManager.GetUserId(User);
-            var isAdmin = User.IsInRole("Admin");
-
-            if (!isAdmin && activity.CreatorId != userId)
-                return Forbid();
-
             ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name", activity.CityId);
             ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", activity.CategoryId);
             return View(activity);
         }
 
+        [Authorize]
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Activity activity)
+        [IgnoreAntiforgeryToken]   // ← no antiforgery cookie required
+        public async Task<IActionResult> Edit(Activity a)
         {
-            if (id != activity.Id) return NotFound();
-
-            var existing = await _context.Activities.AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
-            var userId = _userManager.GetUserId(User);
-            var isAdmin = User.IsInRole("Admin");
-
-            if (existing == null || (!isAdmin && existing.CreatorId != userId))
-                return Forbid();
-
-            if (ModelState.IsValid)
+            if (a.Id == 0 || string.IsNullOrWhiteSpace(a.Title) || a.CityId == 0 || a.CategoryId == 0)
             {
-                activity.CreatorId = existing.CreatorId;
-
-                if (activity.Description != null)
-                {
-                    activity.Description = activity.Description.TrimEnd('?', ' ');
-                }
-
-                _context.Update(activity);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError("", "Title, City and Category are mandatory.");
+                ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name", a.CityId);
+                ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", a.CategoryId);
+                return View(a);
             }
 
-            ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name", activity.CityId);
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", activity.CategoryId);
-            return View(activity);
+            var original = await _context.Activities.AsNoTracking().FirstOrDefaultAsync(x => x.Id == a.Id);
+            if (original == null) return NotFound();
+
+            a.OrganizerId = original.OrganizerId;          
+            _context.Update(a);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
 
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var activity = await _context.Activities
-                .Include(a => a.City)
-                .Include(a => a.Category)
-                .FirstOrDefaultAsync(a => a.Id == id);
-
-            var userId = _userManager.GetUserId(User);
-            var isAdmin = User.IsInRole("Admin");
-
-            if (activity == null || (!isAdmin && activity.CreatorId != userId))
-                return Forbid();
-
-            return View(activity);
-        }
-
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        [Authorize]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
         {
             var activity = await _context.Activities.FindAsync(id);
-            var userId = _userManager.GetUserId(User);
-            var isAdmin = User.IsInRole("Admin");
-
-            if (activity == null || (!isAdmin && activity.CreatorId != userId))
-                return Forbid();
+            if (activity == null) return NotFound();
 
             _context.Activities.Remove(activity);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-        public async Task<IActionResult> ByCategory(int categoryId)
-        {
-            var activities = await _context.Activities
-                .Include(a => a.Category)
-                .Include(a => a.City)
-                .Where(a => a.CategoryId == categoryId)
-                .ToListAsync();
-
-            var category = await _context.Categories.FindAsync(categoryId);
-            ViewBag.CategoryName = category?.Name ?? "Unknown";
-
-            return View("ActivitiesByCategory", activities);
-        }
-        public async Task<IActionResult> ByCity(int cityId)
-        {
-            var activities = await _context.Activities
-                .Include(a => a.Category)
-                .Include(a => a.City)
-                .Where(a => a.CityId == cityId)
-                .ToListAsync();
-
-            var city = await _context.Cities.FindAsync(cityId);
-            ViewBag.CityName = city?.Name ?? "Unknown";
-
-            return View("ActivitiesByCity", activities);
-        }
-
     }
 }

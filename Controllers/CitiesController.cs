@@ -1,13 +1,13 @@
-using EventPlannerPro.Data;
-using EventPlannerPro.Models;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Threading.Tasks;
+using EventPlannerPro.Data;
+using EventPlannerPro.Models;
 
 namespace EventPlannerPro.Controllers
 {
+    [Authorize]                             // guest → login
     public class CitiesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -19,50 +19,52 @@ namespace EventPlannerPro.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var cities = await _context.Cities.ToListAsync();
-            return View(cities);
+            return View(await _context.Cities.AsNoTracking().ToListAsync());
+        }
+
+        [Authorize(Roles = "Admin")]
+        public IActionResult Create() => View();
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(City city)
+        {
+            if (!ModelState.IsValid) return View(city);
+            _context.Add(city);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
-
             var city = await _context.Cities.FindAsync(id);
             if (city == null) return NotFound();
-
             return View(city);
         }
 
-        [HttpPost]
         [Authorize(Roles = "Admin")]
-        [ValidateAntiForgeryToken]
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, City city)
         {
             if (id != city.Id) return NotFound();
+            if (!ModelState.IsValid) return View(city);
 
-            if (ModelState.IsValid)
-            {
-                _context.Update(city);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-
-            return View(city);
+            _context.Update(city);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> ByCity(int cityId)
+        [Authorize(Roles = "Admin")]
+        [HttpPost, ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
         {
-            var activities = await _context.Activities
-                .Include(a => a.City)
-                .Include(a => a.Category)
-                .Where(a => a.CityId == cityId)
-                .ToListAsync();
-
-            var city = await _context.Cities.FindAsync(cityId);
-            ViewBag.CityName = city?.Name ?? "Unknown";
-
-            return View("ActivitiesByCity", activities);
+            var city = await _context.Cities.FindAsync(id);
+            if (city == null) return NotFound();
+            _context.Cities.Remove(city);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
     }
 }
