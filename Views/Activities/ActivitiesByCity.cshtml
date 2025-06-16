@@ -27,6 +27,7 @@ else
                         <p class="card-text">@activity.Description</p>
                         <p class="text-muted mb-1">
                             <strong>Category:</strong> @activity.Category?.Name <br />
+                            <strong>Capacity:</strong> @activity.Participants.Count / @activity.Capacity<br />
                             <strong>Date:</strong> @activity.StartTime.ToString("dd MMM yyyy HH:mm")
                         </p>
                         <a asp-action="Details" asp-route-id="@activity.Id" class="btn btn-sm btn-outline-primary">View Details</a>

@@ -27,6 +27,7 @@ else
                         <p class="card-text">
                             <strong>City:</strong> @activity.City?.Name<br />
                             <strong>Category:</strong> @activity.Category?.Name<br />
+                            <strong>Capacity:</strong> @activity.Participants.Count / @activity.Capacity<br />
                             <strong>Date:</strong> @activity.StartTime.ToString("dd MMM yyyy HH:mm")
                         </p>
                         <div class="d-flex justify-content-center gap-2 mt-auto">

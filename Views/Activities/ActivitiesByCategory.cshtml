@@ -23,6 +23,7 @@ else
                         <p class="card-text">
                             <strong>Place:</strong> @activity.Place<br />
                             <strong>City:</strong> @activity.City?.Name<br />
+                            <strong>Capacity:</strong> @activity.Participants.Count / @activity.Capacity<br />
                             <strong>Start:</strong> @activity.StartTime.ToString("g")<br />
                             <strong>End:</strong> @activity.EndTime.ToString("g")<br />
                             <a asp-action="Details" asp-route-id="@activity.Id" class="btn btn-primary btn-sm mt-2">View Details</a>

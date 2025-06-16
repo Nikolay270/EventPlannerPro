@@ -1,0 +1,115 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using EventPlannerPro.Models
+@model IdentityUser
+
+@{
+    ViewData["Title"] = "Organizer Profile";
+
+    // objects passed in ViewBag by the controller
+    var acts = ViewBag.Activities as IEnumerable<Activity> ?? Enumerable.Empty<Activity>();
+    var reviews = ViewBag.Reviews as IEnumerable<OrganizerReview> ?? Enumerable.Empty<OrganizerReview>();
+    double avg = ViewBag.Average is double d ? d : 0.0;
+    var mine = ViewBag.MyReview as OrganizerReview;
+
+    string avgStars = new string('★', (int)Math.Round(avg)).PadRight(5, '☆');
+}
+
+<!-- ───────────────── Header ────────────────── -->
+<div class="card mb-4 p-4 text-center">
+    <h3>@Model.UserName</h3>
+    <small class="text-muted">@Model.Email</small>
+    <h4 class="mt-3">
+        Average rating: @avg.ToString("0.0")
+        <span style="color:#ffc107">@avgStars</span>
+    </h4>
+</div>
+
+<!-- ───────────────── Review form (if logged-in and not self) ────────────────── -->
+@if (User.Identity!.IsAuthenticated && Model.Id != User.FindFirst("sub")?.Value)
+{
+    <div class="card mb-4 p-4">
+        <h5>@(mine == null ? "Leave a review" : "Edit your review")</h5>
+
+        <form asp-action="Review" method="post">
+            <input type="hidden" name="organizerId" value="@Model.Id" />
+
+            <label class="form-label">Rating</label>
+            <select name="rating" class="form-select w-auto d-inline ms-2">
+                @for (int i = 1; i <= 5; i++)
+                {
+                    if (mine?.Rating == i)
+                    {
+                        <option value="@i" selected>@i</option>
+                    }
+                    else
+                    {
+                        <option value="@i">@i</option>
+                    }
+                }
+            </select>
+
+            <div class="mt-3">
+                <label class="form-label">Comment (optional)</label>
+                <textarea name="comment" maxlength="500" rows="3" class="form-control">@mine?.Comment</textarea>
+            </div>
+
+            <button class="btn btn-primary mt-3">Save</button>
+        </form>
+    </div>
+}
+
+<!-- ───────────────── Reviews list ────────────────── -->
+<h4>Reviews</h4>
+@if (!reviews.Any())
+{
+    <p>No reviews yet.</p>
+}
+else
+{
+    <div class="list-group mb-4">
+        @foreach (var r in reviews)
+        {
+            string stars = new string('★', r.Rating).PadRight(5, '☆');
+            <div class="list-group-item">
+                <strong>@r.Reviewer.UserName</strong>
+                <span class="text-muted">— @r.CreatedOn.ToLocalTime().ToString("dd MMM yyyy hh:mm tt")</span><br />
+                <span style="color:#ffc107">@stars</span>
+                @if (!string.IsNullOrWhiteSpace(r.Comment))
+                {
+                    <p class="mt-1 mb-0">@r.Comment</p>
+                }
+            </div>
+        }
+    </div>
+}
+
+<!-- ───────────────── Organizer's activities ────────────────── -->
+<h4 class="mb-3">Activities by @Model.UserName</h4>
+
+@if (!acts.Any())
+{
+    <p>No activities yet.</p>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        @foreach (var a in acts)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    @if (!string.IsNullOrEmpty(a.PhotoUrl))
+                    {
+                        <img src="@a.PhotoUrl" class="card-img-top" style="object-fit:cover;height:220px" />
+                    }
+                    <div class="card-body">
+                        <h5 class="fw-bold">@a.Title</h5>
+                        <p>@a.Description</p>
+                        <p><strong>Date:</strong> @a.StartTime.ToString("dd MMM yyyy HH:mm")</p>
+                        <a asp-controller="Activities" asp-action="Details" asp-route-id="@a.Id"
+                           class="btn btn-outline-primary w-100">Details</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

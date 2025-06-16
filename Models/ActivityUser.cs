@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System;
+using Microsoft.AspNetCore.Identity;
 
 namespace EventPlannerPro.Models
 {
@@ -9,5 +10,7 @@ namespace EventPlannerPro.Models
 
         public int ActivityId { get; set; }
         public Activity Activity { get; set; } = null!;
+
+        public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
     }
 }

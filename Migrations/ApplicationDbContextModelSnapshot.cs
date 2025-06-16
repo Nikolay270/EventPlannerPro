@@ -30,6 +30,9 @@ namespace EventPlannerPro.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int>("Capacity")
+                        .HasColumnType("int");
+
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
@@ -47,7 +50,6 @@ namespace EventPlannerPro.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("PhotoUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Place")
@@ -80,6 +82,9 @@ namespace EventPlannerPro.Migrations
 
                     b.Property<int>("ActivityId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("JoinedAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("UserId", "ActivityId");
 

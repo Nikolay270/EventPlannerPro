@@ -11,32 +11,34 @@ namespace EventPlannerPro.Models
         public int Id { get; set; }
 
         [Required, MaxLength(100)]
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         public string Description { get; set; } = string.Empty;
 
-        public string Place { get; set; }
+        public string Place { get; set; } = string.Empty;
 
-        [Required]
+        [DataType(DataType.DateTime)]
         public DateTime StartTime { get; set; }
 
-        [Required]
+        [DataType(DataType.DateTime)]
         public DateTime EndTime { get; set; }
 
-        [Required]
+        public string? PhotoUrl { get; set; }
+
+        // FK
         public int CityId { get; set; }
-        public City City { get; set; }
+        public City? City { get; set; }
 
-        [Required]
         public int CategoryId { get; set; }
-        public Category Category { get; set; }
-
-        public string PhotoUrl { get; set; } = string.Empty;
+        public Category? Category { get; set; }
 
         public string? OrganizerId { get; set; }
         public IdentityUser? Organizer { get; set; }
 
-        [NotMapped]                 
+        [Range(1, int.MaxValue, ErrorMessage = "Capacity must be at least 1.")]
+        public int Capacity { get; set; }
+
+        [NotMapped]
         public string? CreatorId
         {
             get => OrganizerId;

@@ -17,16 +17,19 @@
         <dd class="col-sm-10">@Model.Place</dd>
 
         <dt class="col-sm-2">Start Time</dt>
-        <dd class="col-sm-10">@Model.StartTime.ToString("g")</dd>
+        <dd class="col-sm-10">@Model.StartTime.ToString("dd MMM yyyy HH:mm")</dd>
 
         <dt class="col-sm-2">End Time</dt>
-        <dd class="col-sm-10">@Model.EndTime.ToString("g")</dd>
+        <dd class="col-sm-10">@Model.EndTime.ToString("dd MMM yyyy HH:mm")</dd>
 
         <dt class="col-sm-2">City</dt>
         <dd class="col-sm-10">@Model.City?.Name</dd>
 
         <dt class="col-sm-2">Category</dt>
         <dd class="col-sm-10">@Model.Category?.Name</dd>
+
+        <dt class="col-sm-2">Capacity</dt>
+        <dd class="col-sm-10">@Model.Participants.Count / @Model.Capacity</dd>
 
         <dt class="col-sm-2">Description</dt>
         <dd class="col-sm-10">@Model.Description</dd>
@@ -38,14 +41,18 @@
 
     @if (SignInManager.IsSignedIn(User))
     {
-        <form asp-action="Join" asp-route-id="@Model.Id" method="post" style="display:inline">
+        <form asp-action="Join" asp-route-id="@Model.Id" method="post" class="d-inline">
             <button type="submit" class="btn btn-success">Join Activity</button>
         </form>
     }
 
-    @if (User.IsInRole("Admin") || Model.CreatorId == userId)
+    @if (User.IsInRole("Admin") || Model.OrganizerId == userId)
     {
         <a class="btn btn-warning" asp-action="Edit" asp-route-id="@Model.Id">Edit</a>
-        <a class="btn btn-danger" asp-action="Delete" asp-route-id="@Model.Id">Delete</a>
+
+        <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline">
+            <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
     }
+    
 </div>
