@@ -45,8 +45,6 @@ namespace EventPlannerPro.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime2");
 
                     b.Property<string>("OrganizerId")
                         .HasColumnType("nvarchar(450)");

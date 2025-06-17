@@ -1,31 +1,35 @@
 ﻿@model EventPlannerPro.Models.Category
-
 @{
     ViewData["Title"] = "Edit Category";
+    Layout = "_Layout";
 }
 
-<h2 class="mb-4">Edit Category</h2>
+<main class="container-fixed">
+    <div class="form-container mx-auto">
+        <h2 class="text-center mb-4">@ViewData["Title"]</h2>
 
-<form asp-action="Edit" method="post" class="row g-3">
-    <input type="hidden" asp-for="Id" />
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="Id" />
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-    <div class="col-md-6">
-        <label asp-for="Name" class="form-label"></label>
-        <input asp-for="Name" class="form-control" />
-        <span asp-validation-for="Name" class="text-danger"></span>
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label">Name</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="PhotoUrl" class="form-label">Photo URL</label>
+                <input asp-for="PhotoUrl" class="form-control" />
+                <span asp-validation-for="PhotoUrl" class="text-danger"></span>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn-custom">Save Changes</button>
+            </div>
+        </form>
     </div>
-
-    <div class="col-md-6">
-        <label asp-for="PhotoUrl" class="form-label"></label>
-        <input asp-for="PhotoUrl" class="form-control" />
-        <span asp-validation-for="PhotoUrl" class="text-danger"></span>
-    </div>
-
-    <div class="col-12 d-flex gap-2">
-        <button type="submit" class="btn btn-primary">Save</button>
-        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-    </div>
-</form>
+</main>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

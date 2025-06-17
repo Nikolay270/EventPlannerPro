@@ -38,7 +38,7 @@ namespace EventPlannerPro.Data
                 e.HasOne(a => a.Organizer)
                  .WithMany()
                  .HasForeignKey(a => a.OrganizerId)
-                 .OnDelete(DeleteBehavior.Restrict);     
+                 .OnDelete(DeleteBehavior.Restrict);
             });
 
             builder.Entity<OrganizerReview>(e =>

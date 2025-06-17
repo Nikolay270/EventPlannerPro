@@ -37,10 +37,10 @@ namespace EventPlannerPro.Controllers
             return View("CategoryActivities", activities);
         }
 
-        [Authorize(Roles = "Admin")]
+      
         public IActionResult Create() => View();
 
-        [Authorize(Roles = "Admin")]
+       
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Category category)
         {

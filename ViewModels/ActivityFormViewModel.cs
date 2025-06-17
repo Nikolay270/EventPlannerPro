@@ -18,8 +18,6 @@ namespace EventPlannerPro.ViewModels
         [Required]
         public DateTime StartTime { get; set; }
 
-        [Required]
-        public DateTime EndTime { get; set; }
 
         [Required]
         public int? CityId { get; set; }

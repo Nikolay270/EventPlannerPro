@@ -3,48 +3,46 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace EventPlannerPro.Models
 {
     public class Activity
     {
+        [Key]
         public int Id { get; set; }
 
-        [Required, MaxLength(100)]
-        public string Title { get; set; } = string.Empty;
+        [Required, StringLength(100)]
+        public string Title { get; set; }
 
-        public string Description { get; set; } = string.Empty;
+        public string Description { get; set; }
 
-        public string Place { get; set; } = string.Empty;
+        [Display(Name = "Photo URL")]
+        public string PhotoUrl { get; set; }
 
-        [DataType(DataType.DateTime)]
+        [Display(Name = "City")]
+        public int CityId { get; set; }
+        public City City { get; set; }
+
+        [Display(Name = "Category")]
+        public int CategoryId { get; set; }
+        public Category Category { get; set; }
+
+        [Display(Name = "Start Time")]
         public DateTime StartTime { get; set; }
 
-        [DataType(DataType.DateTime)]
-        public DateTime EndTime { get; set; }
-
-        public string? PhotoUrl { get; set; }
-
-        // FK
-        public int CityId { get; set; }
-        public City? City { get; set; }
-
-        public int CategoryId { get; set; }
-        public Category? Category { get; set; }
-
-        public string? OrganizerId { get; set; }
-        public IdentityUser? Organizer { get; set; }
-
-        [Range(1, int.MaxValue, ErrorMessage = "Capacity must be at least 1.")]
+        [Display(Name = "Capacity")]
         public int Capacity { get; set; }
 
-        [NotMapped]
-        public string? CreatorId
-        {
-            get => OrganizerId;
-            set => OrganizerId = value;
-        }
+        // Now uses your own ActivityUser type
+        public ICollection<ActivityUser> Participants { get; set; } = new List<ActivityUser>();
 
-        public List<ActivityUser> Participants { get; set; } = new();
+        // Track the creator
+        [ValidateNever]
+        [ForeignKey("Organizer")]
+
+       
+        public string OrganizerId { get; set; }
+        public IdentityUser Organizer { get; set; }
     }
 }

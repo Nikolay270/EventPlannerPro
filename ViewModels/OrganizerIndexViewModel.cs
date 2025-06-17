@@ -6,7 +6,8 @@ namespace EventPlannerPro.ViewModels
 {
     public class OrganizerIndexViewModel
     {
-        public List<Activity> MyActivities { get; set; } = new();
-        public List<IdentityUser> Organizers { get; set; } = new();
+        public IEnumerable<Activity> MyActivities { get; set; } = new List<Activity>();
+        public IEnumerable<IdentityUser> Organizers { get; set; } = new List<IdentityUser>();
+       
     }
 }

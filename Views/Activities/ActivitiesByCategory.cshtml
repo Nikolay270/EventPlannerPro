@@ -1,36 +1,39 @@
 ﻿@model IEnumerable<EventPlannerPro.Models.Activity>
-
 @{
-    ViewData["Title"] = "Activities for Category";
+    ViewData["Title"] = ViewBag.PageTitle as string ?? "Activities";
+    Layout = "_Layout";
 }
 
-<h2 class="mb-4">Activities in @ViewBag.CategoryName</h2>
+<main class="container-fixed">
+    <h2 class="mb-4">@ViewData["Title"]</h2>
 
-@if (!Model.Any())
-{
-    <p>No activities found for this category.</p>
-}
-else
-{
-    <div class="row">
-        @foreach (var activity in Model)
-        {
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow">
-                    <img src="@activity.PhotoUrl" class="card-img-top" style="height: 200px; object-fit: cover;" alt="Activity Image" />
-                    <div class="card-body">
-                        <h5 class="card-title">@activity.Title</h5>
-                        <p class="card-text">
-                            <strong>Place:</strong> @activity.Place<br />
+    @if (!Model.Any())
+    {
+        <p class="text-muted">No activities found in this category.</p>
+    }
+    else
+    {
+        <div class="activity-grid">
+            @foreach (var activity in Model)
+            {
+                <div class="activity-card">
+                    @if (!string.IsNullOrEmpty(activity.PhotoUrl))
+                    {
+                        <img src="@activity.PhotoUrl" alt="@activity.Title" />
+                    }
+                    <div class="activity-card-body">
+                        <h5>@activity.Title</h5>
+                        <p>@(activity.Description?.Length > 100 ? activity.Description.Substring(0, 100) + "..." : activity.Description)</p>
+                        <small>
                             <strong>City:</strong> @activity.City?.Name<br />
-                            <strong>Capacity:</strong> @activity.Participants.Count / @activity.Capacity<br />
-                            <strong>Start:</strong> @activity.StartTime.ToString("g")<br />
-                            <strong>End:</strong> @activity.EndTime.ToString("g")<br />
-                            <a asp-action="Details" asp-route-id="@activity.Id" class="btn btn-primary btn-sm mt-2">View Details</a>
-                        </p>
+                            <strong>Date:</strong> @activity.StartTime.ToString("dd MMM yyyy")
+                        </small>
+                    </div>
+                    <div class="activity-card-footer">
+                        <a asp-action="Details" asp-route-id="@activity.Id" class="btn-custom btn-sm">Details</a>
                     </div>
                 </div>
-            </div>
-        }
-    </div>
-}
+            }
+        </div>
+    }
+</main>

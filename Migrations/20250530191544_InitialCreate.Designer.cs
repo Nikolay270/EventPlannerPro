@@ -47,9 +47,6 @@ namespace EventPlannerPro.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Place")
                         .IsRequired()
                         .HasMaxLength(100)

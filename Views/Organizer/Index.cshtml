@@ -1,61 +1,94 @@
 ﻿@model EventPlannerPro.ViewModels.OrganizerIndexViewModel
+@using System.Security.Claims
 @{
-    ViewData["Title"] = "Organizers";
-    var ratings = ViewBag.Ratings as IDictionary<string, double>;
+    ViewData["Title"] = "My Profile";
+    var ratings = ViewBag.Ratings as IDictionary<string, double>
+                  ?? new Dictionary<string, double>();
+    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 }
 
-<h2 class="mb-4">My Profile</h2>
+<main class="container-fixed">
+    <h2 class="mb-4">My Profile</h2>
 
-@if (!Model.MyActivities.Any())
-{
-    <p>You haven’t created any activities yet.</p>
-}
-else
-{
-    <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
-        @foreach (var a in Model.MyActivities)
-        {
-            <div class="col">
-                <div class="card h-100 shadow-sm">
+    <h3 class="mb-3">My Activities</h3>
+    @if (!Model.MyActivities.Any())
+    {
+        <p>You haven’t created any activities yet.</p>
+    }
+    else
+    {
+        <div class="activity-grid mb-5">
+            @foreach (var a in Model.MyActivities)
+            {
+                <div class="activity-card">
                     @if (!string.IsNullOrEmpty(a.PhotoUrl))
                     {
-                        <img src="@a.PhotoUrl" class="card-img-top" style="object-fit:cover;height:220px" />
+                        <img src="@a.PhotoUrl" alt="@a.Title" />
                     }
-                    <div class="card-body">
-                        <h5 class="fw-bold">@a.Title</h5>
+                    <div class="activity-card-body">
+                        <h5>@a.Title</h5>
                         <p>@a.Description</p>
-                        <p><strong>City:</strong> @a.City?.Name</p>
-                        <p><strong>Date:</strong> @a.StartTime:dd MMM yyyy HH:mm</p>
-                        <p><strong>Capacity:</strong> @a.Participants.Count / @a.Capacity</p>
+                        <small>
+                            <strong>City:</strong> @a.City?.Name<br />
+                            <strong>Date:</strong> @a.StartTime.ToString("dd MMM yyyy HH:mm")
+                        </small>
                     </div>
+                    <div class="activity-card-footer">
+                        <a asp-controller="Activities"
+                           asp-action="Details"
+                           asp-route-id="@a.Id"
+                           class="btn-custom btn-sm">
+                            Details
+                        </a>
+                        <a asp-controller="Activities"
+                           asp-action="Edit"
+                           asp-route-id="@a.Id"
+                           class="btn-custom btn-sm">
+                            Edit
+                        </a>
+                        <form asp-controller="Activities"
+                              asp-action="Delete"
+                              asp-route-id="@a.Id"
+                              method="post"
+                              class="d-inline">
+                            <button type="submit"
+                                    class="btn-custom btn-sm"
+                                    onclick="return confirm('Delete this activity?');">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <hr class="my-4" />
+
+    <h2 class="mb-3">All Organizers</h2>
+    <div class="activity-grid">
+        @foreach (var u in Model.Organizers)
+        {
+            var avg = ratings.TryGetValue(u.Id, out var s) ? s : 0.0;
+            var stars = new string('★', (int)Math.Round(avg)).PadRight(5, '☆');
+
+            <div class="activity-card text-center">
+                <div class="activity-card-body">
+                    <h5>@u.UserName</h5>
+                    <small class="text-muted">@u.Email</small>
+                    <p class="mt-2 mb-0">
+                        <strong>Rating:</strong> @avg.ToString("0.0")
+                        <span style="color:#ffc107">@stars</span>
+                    </p>
+                </div>
+                <div class="activity-card-footer">
+                    <a asp-action="Profile"
+                       asp-route-id="@u.Id"
+                       class="btn-custom btn-sm w-100">
+                        View Profile
+                    </a>
                 </div>
             </div>
         }
     </div>
-}
-
-<hr class="my-4" />
-
-<h2 class="mb-3">Organizers</h2>
-
-<div class="row row-cols-1 row-cols-md-3 g-4">
-    @foreach (var u in Model.Organizers)
-    {
-        double avg = (ratings != null && ratings.TryGetValue(u.Id, out var s)) ? s : 0.0;
-        string stars = new string('★', (int)Math.Round(avg)).PadRight(5, '☆');
-
-        <div class="col">
-            <div class="card h-100 text-center p-4 shadow-sm">
-                <h4>@u.UserName</h4>
-                <small class="text-muted">@u.Email</small>
-
-                <p class="mt-3 mb-0">
-                    <strong>Rating:</strong> @avg.ToString("0.0") &nbsp;<span style="color:#ffc107">@stars</span>
-                </p>
-
-                <a asp-action="Profile" asp-route-id="@u.Id"
-                   class="btn btn-primary w-100 mt-3">Profile</a>
-            </div>
-        </div>
-    }
-</div>
+</main>

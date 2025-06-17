@@ -1,16 +1,22 @@
-﻿using System;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 
 namespace EventPlannerPro.Models
 {
     public class ActivityUser
     {
-        public string UserId { get; set; } = string.Empty;
-        public IdentityUser User { get; set; } = null!;
+        [Key]
+        public int Id { get; set; }
 
+        // FK back to Activity
         public int ActivityId { get; set; }
-        public Activity Activity { get; set; } = null!;
+        [ForeignKey("ActivityId")]
+        public Activity Activity { get; set; }
 
-        public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
+        // FK to the ASP.NET user
+        public string UserId { get; set; }
+        [ForeignKey("UserId")]
+        public IdentityUser User { get; set; }
     }
 }

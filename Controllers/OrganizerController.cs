@@ -7,13 +7,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using EventPlannerPro.Data;
 using EventPlannerPro.Models;
-using EventPlannerPro.ViewModels;   // ← contains OrganizerIndexViewModel
+using EventPlannerPro.ViewModels;
 
 namespace EventPlannerPro.Controllers
 {
     [Authorize]
-    [Route("Organizer")]
-    [Route("Organizers")]
     public class OrganizerController : Controller
     {
         private readonly ApplicationDbContext _ctx;
@@ -26,14 +24,12 @@ namespace EventPlannerPro.Controllers
             _users = users;
         }
 
-        // --------------------------------------------------------------------
-        // LIST  /Organizer
-        // --------------------------------------------------------------------
-        [HttpGet("")]
+        // GET /Organizer or /Organizer/Index
         public async Task<IActionResult> Index()
         {
             var me = _users.GetUserId(User);
 
+            // Activities *you* organized
             var myActivities = await _ctx.Activities
                                          .Where(a => a.OrganizerId == me)
                                          .Include(a => a.City)
@@ -41,29 +37,41 @@ namespace EventPlannerPro.Controllers
                                          .Include(a => a.Participants)
                                          .ToListAsync();
 
-            var organizers = await _users.GetUsersInRoleAsync("Organizer");
+            // All distinct organizer‐IDs who have at least one activity,
+            // excluding the current user (so you don’t see yourself in "All Organizers")
+            var organizerIds = await _ctx.Activities
+                                         .Select(a => a.OrganizerId)
+                                         .Where(id => id != me)
+                                         .Distinct()
+                                         .ToListAsync();
 
-            // ⭐ build average-rating lookup without server-side GroupBy
+            // Load only those users
+            var organizers = await _users.Users
+                                         .Where(u => organizerIds.Contains(u.Id))
+                                         .ToListAsync();
+
+            // Build average‐rating lookup
             var ratingLookup = (await _ctx.OrganizerReviews
                                          .Select(r => new { r.OrganizerId, r.Rating })
                                          .ToListAsync())
                                .GroupBy(x => x.OrganizerId)
-                               .ToDictionary(g => g.Key,
-                                             g => g.Average(x => x.Rating));
+                               .ToDictionary(
+                                   g => g.Key,
+                                   g => Math.Round(g.Average(x => x.Rating), 1)
+                               );
 
             ViewBag.Ratings = ratingLookup;
 
-            return View("Index", new OrganizerIndexViewModel      // ← existing ViewModel
+            var vm = new OrganizerIndexViewModel
             {
                 MyActivities = myActivities,
-                Organizers = organizers.ToList()
-            });
+                Organizers = organizers
+            };
+            return View(vm);
         }
 
-        // --------------------------------------------------------------------
-        // PROFILE  /Organizer/Profile/{id}
-        // --------------------------------------------------------------------
-        [HttpGet("Profile/{id}")]
+        // GET /Organizer/Profile/{id}
+        [HttpGet]
         public async Task<IActionResult> Profile(string id)
         {
             var org = await _users.FindByIdAsync(id);
@@ -91,22 +99,19 @@ namespace EventPlannerPro.Controllers
                 ViewBag.MyReview = reviews.FirstOrDefault(r => r.ReviewerId == me);
             }
 
-            return View("Profile", org);   // sends IdentityUser + ViewBag data
+            return View(org);
         }
 
-        // --------------------------------------------------------------------
-        // POST  /Organizer/Review
-        // --------------------------------------------------------------------
-        [HttpPost("Review"), ValidateAntiForgeryToken]
+        // POST /Organizer/Review
+        [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Review(string organizerId, int rating, string comment)
         {
             if (rating < 1 || rating > 5) return BadRequest("Rating must be 1-5.");
-
             var me = _users.GetUserId(User);
             if (me == organizerId)
             {
                 TempData["Error"] = "You can’t review yourself.";
-                return RedirectToAction("Profile", new { id = organizerId });
+                return RedirectToAction(nameof(Profile), new { id = organizerId });
             }
 
             var rec = await _ctx.OrganizerReviews
@@ -132,7 +137,7 @@ namespace EventPlannerPro.Controllers
             }
 
             await _ctx.SaveChangesAsync();
-            return RedirectToAction("Profile", new { id = organizerId });
+            return RedirectToAction(nameof(Profile), new { id = organizerId });
         }
     }
 }

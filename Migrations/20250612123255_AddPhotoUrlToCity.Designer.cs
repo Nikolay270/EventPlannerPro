@@ -44,9 +44,6 @@ namespace EventPlannerPro.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("PhotoUrl")
                         .HasColumnType("nvarchar(max)");
 

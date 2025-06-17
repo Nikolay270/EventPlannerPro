@@ -1,83 +1,235 @@
-﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification\
-for details on configuring this project to bundle and minify static web assets. */
-
-a.navbar-brand {
-  white-space: normal;
-  text-align: center;
-  word-break: break-all;
+﻿:root {
+    --logo-bg: #6dcff6;
+    --body-bg: #e3f2fd;
+    --text-color: #023e8a;
+    --btn-bg: #ff6f00;
+    --btn-hover: #fb8c00;
+    --nav-height: 60px;
 }
 
-a {
-  color: #0077cc;
+* {
+    box-sizing: border-box;
 }
 
-.form-control:focus {
-    border-color: #0077cc;
-    box-shadow: 0 0 0 0.2rem #0077cc;
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+    background-color: var(--body-bg);
+    color: var(--text-color);
+    font-family: 'Poppins', sans-serif;
+    min-height: 100vh;
 }
 
-.btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+/* Navbar */
+.navbar-custom {
+    background-color: var(--logo-bg);
+    height: var(--nav-height);
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
 }
 
-.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+.navbar-left, .navbar-right {
+    display: flex;
+    align-items: center;
 }
 
-.btn-link.nav-link:focus {
-  outline: black auto 1px;
+.navbar-left {
+    flex: 1;
 }
 
-html {
-  font-size: 14px;
-}
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+.navbar-right {
+    flex: 1;
+    justify-content: flex-end;
 }
 
-.container {
-  max-width: 960px;
+.navbar-menu {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
-.pricing-header {
-  max-width: 700px;
+    .navbar-menu li {
+        margin-right: 1rem;
+    }
+
+    .navbar-menu a {
+        color: var(--text-color);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+
+        .navbar-menu a:hover {
+            color: var(--btn-bg);
+        }
+
+.navbar-center {
+    flex: 0 0 auto;
+    text-align: center;
 }
 
-.border-top {
-  border-top: 1px solid #e5e5e5;
-}
-.border-bottom {
-  border-bottom: 1px solid #e5e5e5;
+    .navbar-center img {
+        height: 60px;
+    }
+
+.navbar-user {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.box-shadow {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+    .navbar-user .username {
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .navbar-user form {
+        margin: 0;
+    }
+
+/* Buttons */
+.btn-custom {
+    background-color: var(--btn-bg);
+    color: #fff;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: background-color 0.2s;
+    margin-left: 1rem;
 }
 
-button.accept-policy {
-  font-size: 1rem;
-  line-height: inherit;
+    .btn-custom:hover {
+        background-color: var(--btn-hover);
+    }
+
+/* Main content */
+main {
+    padding-top: var(--nav-height);
+    
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+.container-fixed {
+    max-width: 1200px;
+    margin: auto;
+    padding: 1rem;
 }
 
-body {
-  margin-bottom: 60px;
+/* Card grid */
+.activity-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
 }
-.footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  overflow: scroll;
-  white-space: nowrap;
-  line-height: 60px;
+
+
+.activity-card {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+    .activity-card img {
+        width: 100%;
+        height: 180px;
+        object-fit: cover;
+    }
+
+.activity-card-body {
+    padding: 1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+    .activity-card-body h5 {
+        margin: 0 0 0.5rem;
+    }
+
+    .activity-card-body p {
+        flex: 1;
+        color: #555;
+        margin-bottom: 0.5rem;
+    }
+
+.activity-card-footer {
+    padding: 0.75rem;
+    background: #f9f9f9;
+    text-align: center;
+}
+
+    .activity-card-footer .btn {
+        margin: 0 0.25rem;
+    }
+
+/* Hero */
+.hero {
+    width: 100%;
+    height: calc(100vh - var(--nav-height));
+    background: url('/images/background.jpg') center/cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hero-content {
+    background: rgba(255,255,255,0.8);
+    padding: 2rem 3rem;
+    border-radius: 8px;
+    max-width: 90%;
+    text-align: center;
+}
+
+    .hero-content h1 {
+        margin: 0;
+        font-size: 2.5rem;
+        color: var(--text-color);
+    }
+
+    .hero-content p {
+        margin: 1rem 0;
+        font-size: 1.1rem;
+        color: var(--text-color);
+    }
+
+    .hero-content .btn-custom {
+        margin-top: 0.5rem;
+    }
+
+/* Forms */
+.form-container {
+    background: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin: 2rem auto;
+    max-width: 600px;
+}
+
+@media(max-width:768px) {
+    .hero-content {
+        padding: 1rem 2rem;
+    }
+
+        .hero-content h1 {
+            font-size: 2rem;
+        }
+
+        .hero-content p {
+            font-size: 1rem;
+        }
 }

@@ -85,7 +85,7 @@ namespace EventPlannerPro.Controllers
         }
 
 
-        
+
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -95,9 +95,13 @@ namespace EventPlannerPro.Controllers
                                          .Include(a => a.Participants)
                                          .ThenInclude(p => p.User)
                                          .FirstOrDefaultAsync(a => a.Id == id);
+            var me = _userManager.GetUserId(User);
+
+            ViewBag.CanEdit = User.IsInRole("Admin") || activity.OrganizerId == me;
             return activity == null ? NotFound() : View(activity);
+
         }
-        
+
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Join(int id)
         {
@@ -119,7 +123,7 @@ namespace EventPlannerPro.Controllers
                 activity.Participants.Add(new ActivityUser
                 {
                     UserId = userId!,
-                    JoinedAt = DateTime.UtcNow
+                   
                 });
                 await _context.SaveChangesAsync();
             }
@@ -145,7 +149,7 @@ namespace EventPlannerPro.Controllers
 
             return RedirectToAction(nameof(Joined));
         }
-        
+
         public async Task<IActionResult> Joined()
         {
             string? userId = _userManager.GetUserId(User);
@@ -157,58 +161,98 @@ namespace EventPlannerPro.Controllers
                                      .ToListAsync();
             return View("JoinedActivities", list);
         }
-        
+
         public IActionResult Create()
         {
-            ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name");
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
+            ViewBag.Cities = _context.Cities.ToList();
+            ViewBag.Categories = _context.Categories.ToList();
             return View();
         }
 
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Title,Description,Place,StartTime,EndTime,CityId,CategoryId,PhotoUrl,Capacity")] Activity a)
+        public async Task<IActionResult> CreateSimple(
+            string title,
+            string description,
+            string photoUrl,
+            string startTime,
+            int? cityId,
+            int? categoryId,
+            int? capacity)
         {
-            if (!ModelState.IsValid)
-            {
-                ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name", a.CityId);
-                ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", a.CategoryId);
-                return View(a);
-            }
+           
+            DateTime parsedStart = DateTime.TryParse(startTime, out var dt)
+                                   ? dt
+                                   : DateTime.Now;
 
-            a.OrganizerId = _userManager.GetUserId(User);
-            _context.Add(a);
+            var activity = new EventPlannerPro.Models.Activity
+            {
+                Title = title,
+                Description = description,
+                PhotoUrl = photoUrl ?? "",
+                StartTime = parsedStart,
+                Capacity = capacity ?? 0,
+                CityId = cityId ?? 0,
+                CategoryId = categoryId ?? 0,
+                OrganizerId = _userManager.GetUserId(User)!
+            };
+
+   
+            _context.Add(activity);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Edit(int? id)
+        [Authorize]
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null) return NotFound();
+            
             var activity = await _context.Activities.FindAsync(id);
             if (activity == null) return NotFound();
 
-            ViewData["CityId"] = new SelectList(_context.Cities, "Id", "Name", activity.CityId);
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", activity.CategoryId);
+            ViewBag.Cities = _context.Cities.ToList();
+            ViewBag.Categories = _context.Categories.ToList();
+
             return View(activity);
         }
 
+       
         [HttpPost, ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,Place,StartTime,EndTime,CityId,CategoryId,PhotoUrl,Capacity")] Activity a)
+        [Authorize]
+        public async Task<IActionResult> Edit(
+            int id,
+            string title,
+            string description,
+            string photoUrl,
+            string startTime,
+            int? cityId,
+            int? categoryId,
+            int? capacity)
         {
-            if (id != a.Id) return NotFound();
-            if (!ModelState.IsValid) return View(a);
+            
+            var activity = await _context.Activities.FindAsync(id);
+            if (activity == null) return NotFound();
 
-            _context.Update(a);
+           
+            activity.Title = title;
+            activity.Description = description;
+            activity.PhotoUrl = photoUrl ?? "";
+            activity.StartTime = DateTime.TryParse(startTime, out var dt) ? dt : activity.StartTime;
+            activity.Capacity = capacity ?? activity.Capacity;
+            activity.CityId = cityId ?? activity.CityId;
+            activity.CategoryId = categoryId ?? activity.CategoryId;
+      
+            _context.Update(activity);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
             var activity = await _context.Activities.FindAsync(id);
             if (activity == null) return NotFound();
 
-           
+
             if (activity.OrganizerId != _userManager.GetUserId(User) && !User.IsInRole("Admin"))
                 return Forbid();
 

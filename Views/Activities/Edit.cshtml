@@ -1,86 +1,89 @@
 ﻿@model EventPlannerPro.Models.Activity
-
 @{
     ViewData["Title"] = "Edit Activity";
+    Layout = "_Layout";
 }
 
-<h1>Edit Activity</h1>
+<main class="container-fixed">
+  <div class="form-container mx-auto" style="max-width:600px;">
+    <h2 class="text-center mb-4">Edit Activity</h2>
 
-<h4>Activity</h4>
-<hr />
+    <form asp-action="Edit" method="post">
+     
+      <input type="hidden" name="id" value="@Model.Id" />
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="Id" />
+      <div class="mb-3">
+        <label class="form-label">Title</label>
+        <input name="title" value="@Model.Title" class="form-control" />
+      </div>
 
-    <div class="form-group">
-        <label asp-for="Title" class="control-label"></label>
-        <input asp-for="Title" class="form-control" />
-        <span asp-validation-for="Title" class="text-danger"></span>
-    </div>
+      <div class="mb-3">
+        <label class="form-label">Description</label>
+        <textarea name="description" class="form-control">@Model.Description</textarea>
+      </div>
 
-    <div class="form-group">
-        <label asp-for="Place" class="control-label"></label>
-        <input asp-for="Place" class="form-control" />
-        <span asp-validation-for="Place" class="text-danger"></span>
-    </div>
+      <div class="mb-3">
+        <label class="form-label">Photo URL</label>
+        <input name="photoUrl" value="@Model.PhotoUrl" class="form-control" />
+      </div>
 
-    <div class="form-group">
-        <label asp-for="StartTime" class="control-label"></label>
-        <input asp-for="StartTime" type="datetime-local" class="form-control" />
-        <span asp-validation-for="StartTime" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="EndTime" class="control-label"></label>
-        <input asp-for="EndTime" type="datetime-local" class="form-control" />
-        <span asp-validation-for="EndTime" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="CityId" class="control-label"></label>
-        <select asp-for="CityId" class="form-control" asp-items="ViewBag.CityId"></select>
-        <span asp-validation-for="CityId" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="CategoryId" class="control-label"></label>
-        <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
-        <span asp-validation-for="CategoryId" class="text-danger"></span>
-    </div>
-
-    <div class="col-md-2">
-        <label asp-for="Capacity" class="form-label"></label>
-        <input asp-for="Capacity" class="form-control" type="number" min="1" />
-        <span asp-validation-for="Capacity" class="text-danger"></span>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="PhotoUrl" class="control-label">Image URL</label>
-        <input asp-for="PhotoUrl" class="form-control" placeholder="https://example.com/photo.jpg" />
-        <span asp-validation-for="PhotoUrl" class="text-danger"></span>
-    </div>
-
-
-    @if (!string.IsNullOrWhiteSpace(Model.PhotoUrl))
-    {
-        <div class="mb-3">
-            <strong>Current Image:</strong><br />
-            <img src="@Model.PhotoUrl" alt="Preview" style="max-width: 300px;" />
+      <div class="row gx-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label">City</label>
+          <select name="cityId" class="form-select">
+            <option value="">– none –</option>
+            @foreach(var city in (IEnumerable<EventPlannerPro.Models.City>)ViewBag.Cities)
+            {
+                            if (city.Id == Model.CityId)
+                            {
+                                <option value="@city.Id" selected>@city.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@city.Id">@city.Name</option>
+                            }
+            }
+          </select>
         </div>
-    }
+        <div class="col-md-6">
+          <label class="form-label">Category</label>
+          <select name="categoryId" class="form-select">
+            <option value="">– none –</option>
+            @foreach(var cat in (IEnumerable<EventPlannerPro.Models.Category>)ViewBag.Categories)
+            {
+                            if (cat.Id == Model.CategoryId)
+                            {
+                                <option value="@cat.Id" selected>@cat.Name</option>
+                            }
+                            else
+                            {
+                                <option value="@cat.Id">@cat.Name</option>
+                            }
+            }
+          </select>
+        </div>
+      </div>
 
-    <div class="form-group">
-        <label asp-for="Description" class="control-label"></label>
-        <textarea asp-for="Description" class="form-control"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
+      <div class="row gx-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label">Date & Time</label>
+          <input name="startTime"
+                 type="datetime-local"
+                 value="@Model.StartTime.ToString("yyyy-MM-ddTHH:mm")"
+                 class="form-control" />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Capacity</label>
+          <input name="capacity"
+                 type="number"
+                 value="@Model.Capacity"
+                 class="form-control" />
+        </div>
+      </div>
 
-    <button type="submit" class="btn btn-primary">Save</button>
-    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-</form>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
-}
+      <div class="d-grid">
+        <button type="submit" class="btn-custom">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</main>

@@ -43,16 +43,11 @@ namespace EventPlannerPro.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("EndTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("OrganizerId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("PhotoUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Place")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -83,8 +78,8 @@ namespace EventPlannerPro.Migrations
                     b.Property<int>("ActivityId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("JoinedAt")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("Id")
+                        .HasColumnType("int");
 
                     b.HasKey("UserId", "ActivityId");
 
@@ -388,7 +383,8 @@ namespace EventPlannerPro.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "Organizer")
                         .WithMany()
                         .HasForeignKey("OrganizerId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Category");
 

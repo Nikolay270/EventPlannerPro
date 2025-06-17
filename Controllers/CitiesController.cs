@@ -7,7 +7,7 @@ using EventPlannerPro.Models;
 
 namespace EventPlannerPro.Controllers
 {
-    [Authorize]                             // guest → login
+    [Authorize]                             
     public class CitiesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -22,10 +22,10 @@ namespace EventPlannerPro.Controllers
             return View(await _context.Cities.AsNoTracking().ToListAsync());
         }
 
-        [Authorize(Roles = "Admin")]
+       
         public IActionResult Create() => View();
 
-        [Authorize(Roles = "Admin")]
+        
         [HttpPost, ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(City city)
         {

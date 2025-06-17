@@ -1,77 +1,65 @@
-@model EventPlannerPro.Models.Activity
 @{
-    ViewData["Title"] = "Create Activity";
+    ViewData["Title"] = "Create New Activity";
+    Layout = "_Layout";
 }
 
-<h2 class="mb-4">Create Activity</h2>
+<main class="container-fixed">
+    <div class="form-container mx-auto" style="max-width:600px;">
+        <h2 class="text-center mb-4">Create New Activity</h2>
 
-<form asp-action="Create" method="post" class="row g-3">
-    @Html.AntiForgeryToken()
+        <form asp-action="CreateSimple" method="post">
+            <div class="mb-3">
+                <label class="form-label">Title</label>
+                <input name="title" class="form-control" />
+            </div>
 
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-control"></textarea>
+            </div>
 
-    <div class="col-md-6">
-        <label asp-for="Title" class="form-label"></label>
-        <input asp-for="Title" class="form-control" />
-        <span asp-validation-for="Title" class="text-danger"></span>
+            <div class="mb-3">
+                <label class="form-label">Photo URL</label>
+                <input name="photoUrl" class="form-control" />
+            </div>
+
+            <div class="row gx-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">City</label>
+                    <select name="cityId" class="form-select">
+                        <option value="">– none –</option>
+                        @foreach (var city in (IEnumerable<EventPlannerPro.Models.City>)ViewBag.Cities)
+                        {
+                            <option value="@city.Id">@city.Name</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Category</label>
+                    <select name="categoryId" class="form-select">
+                        <option value="">– none –</option>
+                        @foreach (var cat in (IEnumerable<EventPlannerPro.Models.Category>)ViewBag.Categories)
+                        {
+                            <option value="@cat.Id">@cat.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="row gx-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Date & Time</label>
+                    <input name="startTime" type="datetime-local" class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Capacity</label>
+                    <input name="capacity" type="number" class="form-control" />
+                </div>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn-custom">Create Activity</button>
+            </div>
+        </form>
     </div>
-
-    <div class="col-md-6">
-        <label asp-for="Place" class="form-label"></label>
-        <input asp-for="Place" class="form-control" />
-        <span asp-validation-for="Place" class="text-danger"></span>
-    </div>
-
-    <div class="col-12">
-        <label asp-for="Description" class="form-label"></label>
-        <textarea asp-for="Description" class="form-control"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
-
-    <div class="col-md-4">
-        <label asp-for="CityId" class="form-label"></label>
-        <select asp-for="CityId" asp-items="ViewBag.CityId" class="form-select">
-            <option value="">Choose city…</option>
-        </select>
-        <span asp-validation-for="CityId" class="text-danger"></span>
-    </div>
-
-    <div class="col-md-4">
-        <label asp-for="CategoryId" class="form-label"></label>
-        <select asp-for="CategoryId" asp-items="ViewBag.CategoryId" class="form-select">
-            <option value="">Choose category…</option>
-        </select>
-        <span asp-validation-for="CategoryId" class="text-danger"></span>
-    </div>
-
-    <div class="col-md-4">
-        <label asp-for="PhotoUrl" class="form-label"></label>
-        <input asp-for="PhotoUrl" class="form-control" />
-        <span asp-validation-for="PhotoUrl" class="text-danger"></span>
-    </div>
-
-    <div class="col-md-6">
-        <label asp-for="StartTime" class="form-label"></label>
-        <input asp-for="StartTime" type="datetime-local" class="form-control" />
-        <span asp-validation-for="StartTime" class="text-danger"></span>
-    </div>
-
-    <div class="col-md-6">
-        <label asp-for="EndTime" class="form-label"></label>
-        <input asp-for="EndTime" type="datetime-local" class="form-control" />
-        <span asp-validation-for="EndTime" class="text-danger"></span>
-    </div>
-    <div class="col-md-2">
-        <label asp-for="Capacity" class="form-label"></label>
-        <input asp-for="Capacity" class="form-control" type="number" min="1" />
-        <span asp-validation-for="Capacity" class="text-danger"></span>
-    </div>
-
-    <div class="col-12 d-grid">
-        <button type="submit" class="btn btn-primary">Create</button>
-    </div>
-</form>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+</main>
