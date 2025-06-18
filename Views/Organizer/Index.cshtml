@@ -1,19 +1,19 @@
 ﻿@model EventPlannerPro.ViewModels.OrganizerIndexViewModel
 @using System.Security.Claims
 @{
-    ViewData["Title"] = "My Profile";
+    ViewData["Title"] = "Моят профил";
     var ratings = ViewBag.Ratings as IDictionary<string, double>
                   ?? new Dictionary<string, double>();
     var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 }
 
 <main class="container-fixed">
-    <h2 class="mb-4">My Profile</h2>
+    <h2 class="mb-4">Моят профил</h2>
 
-    <h3 class="mb-3">My Activities</h3>
+    <h3 class="mb-3">Моите събития</h3>
     @if (!Model.MyActivities.Any())
     {
-        <p>You haven’t created any activities yet.</p>
+        <p>Все още не сте създали никакви събития.</p>
     }
     else
     {
@@ -29,8 +29,8 @@
                         <h5>@a.Title</h5>
                         <p>@a.Description</p>
                         <small>
-                            <strong>City:</strong> @a.City?.Name<br />
-                            <strong>Date:</strong> @a.StartTime.ToString("dd MMM yyyy HH:mm")
+                            <strong>Град:</strong> @a.City?.Name<br />
+                            <strong>Дата:</strong> @a.StartTime.ToString("dd MMM yyyy HH:mm")
                         </small>
                     </div>
                     <div class="activity-card-footer">
@@ -38,13 +38,13 @@
                            asp-action="Details"
                            asp-route-id="@a.Id"
                            class="btn-custom btn-sm">
-                            Details
+                            Подробности
                         </a>
                         <a asp-controller="Activities"
                            asp-action="Edit"
                            asp-route-id="@a.Id"
                            class="btn-custom btn-sm">
-                            Edit
+                            Редактирай
                         </a>
                         <form asp-controller="Activities"
                               asp-action="Delete"
@@ -53,8 +53,8 @@
                               class="d-inline">
                             <button type="submit"
                                     class="btn-custom btn-sm"
-                                    onclick="return confirm('Delete this activity?');">
-                                Delete
+                                    onclick="return confirm('Наистина ли желаете да изтриете това събитие?');">
+                                Изтрий
                             </button>
                         </form>
                     </div>
@@ -65,7 +65,7 @@
 
     <hr class="my-4" />
 
-    <h2 class="mb-3">All Organizers</h2>
+    <h2 class="mb-3">Всички организатори</h2>
     <div class="activity-grid">
         @foreach (var u in Model.Organizers)
         {
@@ -77,7 +77,7 @@
                     <h5>@u.UserName</h5>
                     <small class="text-muted">@u.Email</small>
                     <p class="mt-2 mb-0">
-                        <strong>Rating:</strong> @avg.ToString("0.0")
+                        <strong>Рейтинг:</strong> @avg.ToString("0.0")
                         <span style="color:#ffc107">@stars</span>
                     </p>
                 </div>
@@ -85,7 +85,7 @@
                     <a asp-action="Profile"
                        asp-route-id="@u.Id"
                        class="btn-custom btn-sm w-100">
-                        View Profile
+                        Виж профила
                     </a>
                 </div>
             </div>

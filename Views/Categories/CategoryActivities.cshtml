@@ -1,19 +1,18 @@
 ﻿@model IEnumerable<EventPlannerPro.Models.Activity>
 @using EventPlannerPro.Models
 @{
-    ViewData["Title"] = "Activities in this Category";
+    ViewData["Title"] = "Събития в тази категория";
     bool isAdmin = User.IsInRole("Admin");
 }
 
-<h2 class="mb-4">Activities in @ViewBag.Category.Name</h2>
-
+<h2 class="mb-4">Събития в @ViewBag.Category.Name</h2>
 
 @if (!Model.Any())
 {
-    <p class="text-muted mb-3">Activities for this category are not created yet.</p>
+    <p class="text-muted mb-3">Все още няма създадени събития за тази категория.</p>
     @if (isAdmin)
     {
-        <a asp-controller="Activities" asp-action="Create" class="btn btn-success">Create Activity</a>
+        <a asp-controller="Activities" asp-action="Create" class="btn btn-success">Създай събитие</a>
     }
 }
 else
@@ -31,11 +30,11 @@ else
                         <h5 class="card-title">@activity.Title</h5>
                         <p class="card-text">@activity.Description</p>
                         <p class="card-text">
-                            <strong>City:</strong> @activity.City?.Name<br />
-                            <strong>Date:</strong> @activity.StartTime.ToString("dd MMM yyyy HH:mm")
+                            <strong>Град:</strong> @activity.City?.Name<br />
+                            <strong>Дата:</strong> @activity.StartTime.ToString("dd MMM yyyy HH:mm")
                         </p>
                         <div class="d-flex justify-content-center gap-2 mt-auto">
-                            <a asp-controller="Activities" asp-action="Details" asp-route-id="@activity.Id" class="btn btn-outline-primary btn-sm">View Details</a>
+                            <a asp-controller="Activities" asp-action="Details" asp-route-id="@activity.Id" class="btn btn-outline-primary btn-sm">Виж подробности</a>
                         </div>
                     </div>
                 </div>

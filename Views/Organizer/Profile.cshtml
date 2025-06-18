@@ -2,7 +2,7 @@
 @using EventPlannerPro.Models
 @using System.Security.Claims
 @{
-    ViewData["Title"] = $"{Model.UserName}'s Profile";
+    ViewData["Title"] = $"Профил на {Model.UserName}";
 
     // Pull data out of ViewBag
     var activities = ViewBag.Activities as IEnumerable<Activity> ?? Enumerable.Empty<Activity>();
@@ -19,10 +19,10 @@
     <h2 class="mb-4">@ViewData["Title"]</h2>
 
     <section class="mb-5">
-        <h3>Activities by @Model.UserName</h3>
+        <h3>Събития от @Model.UserName</h3>
         @if (!activities.Any())
         {
-            <p class="text-muted">No activities created yet.</p>
+            <p class="text-muted">Все още няма създадени събития.</p>
         }
         else
         {
@@ -38,8 +38,8 @@
                             <div class="activity-card-body">
                                 <h5>@a.Title</h5>
                                 <small>
-                                    <strong>City:</strong> @a.City?.Name<br />
-                                    <strong>Date:</strong> @a.StartTime.ToString("dd MMM yyyy HH:mm")
+                                    <strong>Град:</strong> @a.City?.Name<br />
+                                    <strong>Дата:</strong> @a.StartTime.ToString("dd MMM yyyy HH:mm")
                                 </small>
                             </div>
                             <div class="activity-card-footer text-center">
@@ -47,7 +47,7 @@
                                    asp-action="Details"
                                    asp-route-id="@a.Id"
                                    class="btn-custom btn-sm">
-                                    Details
+                                    Подробности
                                 </a>
                             </div>
                         </div>
@@ -58,10 +58,10 @@
     </section>
 
     <section class="mb-5">
-        <h3>Reviews (average: @average.ToString("0.0"))</h3>
+        <h3>Отзиви (средно: @average.ToString("0.0"))</h3>
         @if (!reviews.Any())
         {
-            <p class="text-muted">No reviews yet.</p>
+            <p class="text-muted">Все още няма отзиви.</p>
         }
         else
         {
@@ -71,10 +71,7 @@
                     <li class="mb-3">
                         <strong>@r.Reviewer.UserName:</strong>
                         <span style="color:#ffc107">
-                            @(
-                                new string('★', (int)r.Rating)
-                                .PadRight(5, '☆')
-                                )
+                            @(new string('★', (int)r.Rating).PadRight(5, '☆'))
                         </span>
 
                         <br />
@@ -89,25 +86,24 @@
     @if (canReview)
     {
         <section class="mb-5">
-            <h3>Leave a Review</h3>
+            <h3>Остави отзив</h3>
             <form asp-action="Review" method="post">
                 <input type="hidden" name="organizerId" value="@Model.Id" />
 
                 <div class="mb-3">
-                    <label class="form-label">Rating (1–5)</label>
+                    <label class="form-label">Оценка (1–5)</label>
                     <input name="rating" type="number" min="1" max="5" class="form-control" />
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Comment</label>
+                    <label class="form-label">Коментар</label>
                     <textarea name="comment" class="form-control"></textarea>
                 </div>
 
                 <div class="d-grid">
-                    <button type="submit" class="btn-custom">Submit Review</button>
+                    <button type="submit" class="btn-custom">Изпрати отзив</button>
                 </div>
             </form>
         </section>
     }
-
 </main>

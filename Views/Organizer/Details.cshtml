@@ -1,7 +1,7 @@
 ﻿@model Microsoft.AspNetCore.Identity.IdentityUser
 @using EventPlannerPro.Models
 @{
-    ViewData["Title"] = "Organizer Profile";
+    ViewData["Title"] = "Профил на организатора";
     var acts = ViewBag.Activities as IEnumerable<Activity>;
     var revs = ViewBag.Reviews as IEnumerable<OrganizerReview>;
     double avg = (double)ViewBag.Avg;
@@ -11,13 +11,13 @@
 <p class="text-muted">@Model.Email</p>
 @if (avg > 0)
 {
-    <p>Average Rating: @avg.ToString("0.0") ★</p>
+    <p>Среден рейтинг: @avg.ToString("0.0") ★</p>
 }
 
-<h4 class="mt-4">Activities</h4>
+<h4 class="mt-4">Събития</h4>
 @if (!acts.Any())
 {
-    <p>No activities.</p>
+    <p>Няма събития.</p>
 }
 else
 {
@@ -31,10 +31,10 @@ else
     </ul>
 }
 
-<h4>Reviews</h4>
+<h4>Отзиви</h4>
 @if (!revs.Any())
 {
-    <p>No reviews yet.</p>
+    <p>Все още няма отзиви.</p>
 }
 else
 {
@@ -43,13 +43,13 @@ else
         {
             <li class="list-group-item">
                 <strong>@r.Rating ★</strong> – @r.Comment
-                <br /><small class="text-muted">by @r.Reviewer.UserName (@r.CreatedOn.ToString("dd MMM yyyy"))</small>
+                <br /><small class="text-muted">от @r.Reviewer.UserName (@r.CreatedOn.ToString("dd MMM yyyy"))</small>
             </li>
         }
     </ul>
 }
 
-<h5 class="mt-4">Leave a Review</h5>
+<h5 class="mt-4">Остави отзив</h5>
 <form asp-action="Review" method="post" class="row g-2">
     <input type="hidden" name="organizerId" value="@Model.Id" />
     <div class="col-12 col-md-2">
@@ -62,9 +62,9 @@ else
         </select>
     </div>
     <div class="col-12 col-md-8">
-        <input type="text" name="comment" placeholder="Comment" class="form-control" />
+        <input type="text" name="comment" placeholder="Коментар" class="form-control" />
     </div>
     <div class="col-12 col-md-2 d-grid">
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary">Изпрати</button>
     </div>
 </form>

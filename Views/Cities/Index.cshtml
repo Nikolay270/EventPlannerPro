@@ -1,18 +1,18 @@
-@model IEnumerable<EventPlannerPro.Models.City>
+﻿@model IEnumerable<EventPlannerPro.Models.City>
 @{
-    ViewData["Title"] = "Browse Cities";
+    ViewData["Title"] = "Градове";
     bool isAdmin = User.IsInRole("Admin");
 }
 
 <div class="container-fixed">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Browse Cities</h2>
-        <a asp-action="Create" class="btn-custom">Create New City</a>
+        <h2>@ViewData["Title"]</h2>
+        <a asp-action="Create" class="btn-custom">Създаване на нов град</a>
     </div>
 
     @if (!Model.Any())
     {
-        <p class="text-muted">No cities found.</p>
+        <p class="text-muted">Няма намерени градове.</p>
     }
     else
     {
@@ -34,19 +34,19 @@
                                asp-action="ByCity"
                                asp-route-cityId="@city.Id"
                                class="btn-custom btn-sm">
-                                View Activities
+                                Виж събития
                             </a>
                             @if (isAdmin)
                             {
-                                <a asp-action="Edit" asp-route-id="@city.Id" class="btn-custom btn-sm">Edit</a>
+                                <a asp-action="Edit" asp-route-id="@city.Id" class="btn-custom btn-sm">Редактирай</a>
                                 <form asp-action="Delete"
                                       asp-route-id="@city.Id"
                                       method="post"
                                       class="d-inline">
                                     <button type="submit"
                                             class="btn-custom btn-sm"
-                                            onclick="return confirm('Delete this city?');">
-                                        Delete
+                                            onclick="return confirm('Наистина ли желаете да изтриете този град?');">
+                                        Изтрий
                                     </button>
                                 </form>
                             }

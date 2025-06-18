@@ -1,90 +1,90 @@
-@model IEnumerable<EventPlannerPro.Models.Activity>
+﻿@model IEnumerable<EventPlannerPro.Models.Activity>
 @using EventPlannerPro.Models
 
 @{
-    ViewData["Title"] = "All Activities";
-    var cities     = ViewBag.Cities     as IEnumerable<City>       ?? Enumerable.Empty<City>();
+    ViewData["Title"] = "Всички събития";
+    var cities = ViewBag.Cities as IEnumerable<City> ?? Enumerable.Empty<City>();
     var categories = ViewBag.Categories as IEnumerable<Category> ?? Enumerable.Empty<Category>();
-    var qTitle     = Context.Request.Query["searchTitle"].ToString();
-    var qCity      = Context.Request.Query["cityId"].ToString();
-    var qCategory  = Context.Request.Query["categoryId"].ToString();
-    var qDate      = Context.Request.Query["date"].ToString();
+    var qTitle = Context.Request.Query["searchTitle"].ToString();
+    var qCity = Context.Request.Query["cityId"].ToString();
+    var qCategory = Context.Request.Query["categoryId"].ToString();
+    var qDate = Context.Request.Query["date"].ToString();
 }
 
 <div class="container-fixed">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>All Activities</h2>
-    <a asp-action="Create" class="btn-custom">Create New Activity</a>
-  </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Всички събития</h2>
+        <a asp-action="Create" class="btn-custom">Създаване на ново събитие</a>
+    </div>
 
-  <form asp-action="Index" method="get" class="row gy-2 gx-2 mb-4 align-items-end">
-    <div class="col-12 col-md-4">
-      <label class="form-label">Title</label>
-      <input type="text" name="searchTitle" value="@qTitle" placeholder="Search by title" class="form-control" />
-    </div>
-    <div class="col-6 col-md-2">
-      <label class="form-label">City</label>
-      <select name="cityId" class="form-select">
-        <option value="">All Cities</option>
-        @foreach (var c in cities)
-        {
-            var sel = qCity == c.Id.ToString() ? "selected" : "";
-                    <option value="@c.Id" selected="@(qCategory==c.Id.ToString())">@c.Name</option>
-        }
-      </select>
-    </div>
-    <div class="col-6 col-md-2">
-      <label class="form-label">Category</label>
-      <select name="categoryId" class="form-select">
-        <option value="">All Categories</option>
-        @foreach (var cat in categories)
-        {
-            var sel = qCategory == cat.Id.ToString() ? "selected" : "";
-                    <option value="@cat.Id" selected="@(qCategory==cat.Id.ToString())">@cat.Name</option>
-        }
-      </select>
-    </div>
-    <div class="col-6 col-md-2">
-      <label class="form-label">Date</label>
-      <input type="date" name="date" value="@qDate" class="form-control" />
-    </div>
-    <div class="col-6 col-md-2 d-grid">
-      <button type="submit" class="btn-custom">Filter</button>
-    </div>
-  </form>
-
-  @if (!Model.Any())
-  {
-    <p class="text-muted">No activities found.</p>
-  }
-  else
-  {
-    <div class="activity-grid">
-      @foreach (var activity in Model)
-      {
-        <div class="activity-card">
-          @if (!string.IsNullOrEmpty(activity.PhotoUrl))
-          {
-            <img src="@activity.PhotoUrl" alt="@activity.Title" />
-          }
-          <div class="activity-card-body">
-            <h5>@activity.Title</h5>
-            <p>@(activity.Description?.Length > 100 ? activity.Description.Substring(0,100) + "..." : activity.Description)</p>
-            <small>
-              <strong>City:</strong> @activity.City?.Name<br />
-              <strong>Category:</strong> @activity.Category?.Name<br />
-              <strong>Capacity:</strong> @activity.Participants.Count/@activity.Capacity<br />
-              <strong>Date:</strong> @activity.StartTime.ToString("dd MMM yyyy")
-            </small>
-          </div>
-          <div class="activity-card-footer">
-                        <a asp-action="Details" asp-route-id="@activity.Id" class="btn-custom btn-sm">Details</a>
-            <form asp-action="Join" asp-route-id="@activity.Id" method="post" class="d-inline">
-              <button type="submit" class="btn-custom btn-sm">Join</button>
-            </form>
-          </div>
+    <form asp-action="Index" method="get" class="row gy-2 gx-2 mb-4 align-items-end">
+        <div class="col-12 col-md-4">
+            <label class="form-label">Заглавие</label>
+            <input type="text" name="searchTitle" value="@qTitle" placeholder="Търсене по заглавие" class="form-control" />
         </div>
-      }
-    </div>
-  }
+        <div class="col-6 col-md-2">
+            <label class="form-label">Град</label>
+            <select name="cityId" class="form-select">
+                <option value="">Всички градове</option>
+                @foreach (var c in cities)
+                {
+                    var sel = qCity == c.Id.ToString() ? "selected" : "";
+                    <option value="@c.Id" selected="@(qCategory==c.Id.ToString())">@c.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label">Категория</label>
+            <select name="categoryId" class="form-select">
+                <option value="">Всички категории</option>
+                @foreach (var cat in categories)
+                {
+                    var sel = qCategory == cat.Id.ToString() ? "selected" : "";
+                    <option value="@cat.Id" selected="@(qCategory==cat.Id.ToString())">@cat.Name</option>
+                }
+            </select>
+        </div>
+        <div class="col-6 col-md-2">
+            <label class="form-label">Дата</label>
+            <input type="date" name="date" value="@qDate" class="form-control" />
+        </div>
+        <div class="col-6 col-md-2 d-grid">
+            <button type="submit" class="btn-custom">Филтрирай</button>
+        </div>
+    </form>
+
+    @if (!Model.Any())
+    {
+        <p class="text-muted">Няма намерени събития.</p>
+    }
+    else
+    {
+        <div class="activity-grid">
+            @foreach (var activity in Model)
+            {
+                <div class="activity-card">
+                    @if (!string.IsNullOrEmpty(activity.PhotoUrl))
+                    {
+                        <img src="@activity.PhotoUrl" alt="@activity.Title" />
+                    }
+                    <div class="activity-card-body">
+                        <h5>@activity.Title</h5>
+                        <p>@(activity.Description?.Length > 100 ? activity.Description.Substring(0, 100) + "..." : activity.Description)</p>
+                        <small>
+                            <strong>Град:</strong> @activity.City?.Name<br />
+                            <strong>Категория:</strong> @activity.Category?.Name<br />
+                            <strong>Капацитет:</strong> @activity.Participants.Count/@activity.Capacity<br />
+                            <strong>Дата:</strong> @activity.StartTime.ToString("dd MMM yyyy")
+                        </small>
+                    </div>
+                    <div class="activity-card-footer">
+                        <a asp-action="Details" asp-route-id="@activity.Id" class="btn-custom btn-sm">Подробности</a>
+                        <form asp-action="Join" asp-route-id="@activity.Id" method="post" class="d-inline">
+                            <button type="submit" class="btn-custom btn-sm">Участвай</button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    }
 </div>

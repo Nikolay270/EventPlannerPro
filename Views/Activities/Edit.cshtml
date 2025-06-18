@@ -1,39 +1,39 @@
 ﻿@model EventPlannerPro.Models.Activity
 @{
-    ViewData["Title"] = "Edit Activity";
+    ViewData["Title"] = "Редактиране на събитието";
     Layout = "_Layout";
 }
 
 <main class="container-fixed">
   <div class="form-container mx-auto" style="max-width:600px;">
-    <h2 class="text-center mb-4">Edit Activity</h2>
+        <h2 class="text-center mb-4">Редактиране на събитието</h2>
 
-    <form asp-action="Edit" method="post">
-     
-      <input type="hidden" name="id" value="@Model.Id" />
+        <form asp-action="Edit" method="post">
 
-      <div class="mb-3">
-        <label class="form-label">Title</label>
-        <input name="title" value="@Model.Title" class="form-control" />
-      </div>
+            <input type="hidden" name="id" value="@Model.Id" />
 
-      <div class="mb-3">
-        <label class="form-label">Description</label>
-        <textarea name="description" class="form-control">@Model.Description</textarea>
-      </div>
+            <div class="mb-3">
+                <label class="form-label">Заглавие</label>
+                <input name="title" value="@Model.Title" class="form-control" />
+            </div>
 
-      <div class="mb-3">
-        <label class="form-label">Photo URL</label>
-        <input name="photoUrl" value="@Model.PhotoUrl" class="form-control" />
-      </div>
+            <div class="mb-3">
+                <label class="form-label">Описание</label>
+                <textarea name="description" class="form-control">@Model.Description</textarea>
+            </div>
 
-      <div class="row gx-3 mb-3">
-        <div class="col-md-6">
-          <label class="form-label">City</label>
-          <select name="cityId" class="form-select">
-            <option value="">– none –</option>
-            @foreach(var city in (IEnumerable<EventPlannerPro.Models.City>)ViewBag.Cities)
-            {
+            <div class="mb-3">
+                <label class="form-label">URL на снимка</label>
+                <input name="photoUrl" value="@Model.PhotoUrl" class="form-control" />
+            </div>
+
+            <div class="row gx-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Град</label>
+                    <select name="cityId" class="form-select">
+                        <option value="">– няма –</option>
+                        @foreach (var city in (IEnumerable<EventPlannerPro.Models.City>)ViewBag.Cities)
+                        {
                             if (city.Id == Model.CityId)
                             {
                                 <option value="@city.Id" selected>@city.Name</option>
@@ -42,15 +42,15 @@
                             {
                                 <option value="@city.Id">@city.Name</option>
                             }
-            }
-          </select>
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Category</label>
-          <select name="categoryId" class="form-select">
-            <option value="">– none –</option>
-            @foreach(var cat in (IEnumerable<EventPlannerPro.Models.Category>)ViewBag.Categories)
-            {
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Категория</label>
+                    <select name="categoryId" class="form-select">
+                        <option value="">– няма –</option>
+                        @foreach (var cat in (IEnumerable<EventPlannerPro.Models.Category>)ViewBag.Categories)
+                        {
                             if (cat.Id == Model.CategoryId)
                             {
                                 <option value="@cat.Id" selected>@cat.Name</option>
@@ -59,31 +59,31 @@
                             {
                                 <option value="@cat.Id">@cat.Name</option>
                             }
-            }
-          </select>
-        </div>
-      </div>
+                        }
+                    </select>
+                </div>
+            </div>
 
-      <div class="row gx-3 mb-3">
-        <div class="col-md-6">
-          <label class="form-label">Date & Time</label>
-          <input name="startTime"
-                 type="datetime-local"
-                 value="@Model.StartTime.ToString("yyyy-MM-ddTHH:mm")"
-                 class="form-control" />
-        </div>
-        <div class="col-md-6">
-          <label class="form-label">Capacity</label>
-          <input name="capacity"
-                 type="number"
-                 value="@Model.Capacity"
-                 class="form-control" />
-        </div>
-      </div>
+            <div class="row gx-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">Дата и час</label>
+                    <input name="startTime"
+                           type="datetime-local"
+                           value="@Model.StartTime.ToString("yyyy-MM-ddTHH:mm")"
+                           class="form-control" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Капацитет</label>
+                    <input name="capacity"
+                           type="number"
+                           value="@Model.Capacity"
+                           class="form-control" />
+                </div>
+            </div>
 
-      <div class="d-grid">
-        <button type="submit" class="btn-custom">Save Changes</button>
-      </div>
-    </form>
+            <div class="d-grid">
+                <button type="submit" class="btn-custom">Запази промените</button>
+            </div>
+        </form>
   </div>
 </main>

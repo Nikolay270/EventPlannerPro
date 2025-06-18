@@ -1,14 +1,14 @@
 ﻿@model IEnumerable<EventPlannerPro.Models.Activity>
 
 @{
-    ViewData["Title"] = "Joined Activities";
+    ViewData["Title"] = "Присъединени събития";
 }
 
-<h2 class="mb-4">Joined Activities</h2>
+<h2 class="mb-4">@ViewData["Title"]</h2>
 
 @if (!Model.Any())
 {
-    <p class="text-muted">You haven't joined any activities yet.</p>
+    <p class="text-muted">Все още не сте се присъединили към нито едно събитие.</p>
 }
 else
 {
@@ -25,15 +25,15 @@ else
                         <h5 class="card-title">@activity.Title</h5>
                         <p class="card-text">@activity.Description</p>
                         <p class="card-text">
-                            <strong>City:</strong> @activity.City?.Name<br />
-                            <strong>Category:</strong> @activity.Category?.Name<br />
-                            <strong>Capacity:</strong> @activity.Participants.Count / @activity.Capacity<br />
-                            <strong>Date:</strong> @activity.StartTime.ToString("dd MMM yyyy HH:mm")
+                            <strong>Град:</strong> @activity.City?.Name<br />
+                            <strong>Категория:</strong> @activity.Category?.Name<br />
+                            <strong>Капацитет:</strong> @activity.Participants.Count / @activity.Capacity<br />
+                            <strong>Дата:</strong> @activity.StartTime.ToString("dd MMM yyyy HH:mm")
                         </p>
                         <div class="d-flex justify-content-center gap-2 mt-auto">
-                            <a asp-action="Details" asp-route-id="@activity.Id" class="btn btn-outline-primary btn-sm">View Details</a>
+                            <a asp-action="Details" asp-route-id="@activity.Id" class="btn btn-outline-primary btn-sm">Виж подробности</a>
                             <form asp-action="Leave" asp-route-id="@activity.Id" method="post" class="d-inline">
-                                <button type="submit" class="btn btn-danger btn-sm">Leave</button>
+                                <button type="submit" class="btn btn-danger btn-sm">Напусни</button>
                             </form>
                         </div>
                     </div>

@@ -14,7 +14,6 @@ namespace EventPlannerPro.Models
         [ForeignKey("ActivityId")]
         public Activity Activity { get; set; }
 
-        // FK to the ASP.NET user
         public string UserId { get; set; }
         [ForeignKey("UserId")]
         public IdentityUser User { get; set; }

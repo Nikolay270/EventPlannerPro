@@ -9,7 +9,7 @@
 
     @if (!Model.Any())
     {
-        <p class="text-muted">No activities found in this city.</p>
+        <p class="text-muted">Няма намерени дейности в този град.</p>
     }
     else
     {
@@ -25,14 +25,15 @@
                         <h5>@activity.Title</h5>
                         <p>@(activity.Description?.Length > 100 ? activity.Description.Substring(0, 100) + "..." : activity.Description)</p>
                         <small>
-                            <strong>Date:</strong> @activity.StartTime.ToString("dd MMM yyyy")
+                            <strong>Дата:</strong> @activity.StartTime.ToString("dd MMM yyyy")
                         </small>
                     </div>
                     <div class="activity-card-footer">
-                        <a asp-action="Details" asp-route-id="@activity.Id" class="btn-custom btn-sm">Details</a>
+                        <a asp-action="Details" asp-route-id="@activity.Id" class="btn-custom btn-sm">Подробности</a>
                     </div>
                 </div>
             }
         </div>
+    }
     }
 </main>

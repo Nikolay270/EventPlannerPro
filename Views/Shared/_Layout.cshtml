@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="bg">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -12,30 +12,30 @@
     <nav class="navbar-custom">
         <div class="navbar-left">
             <ul class="navbar-menu">
-                <li><a asp-controller="Home" asp-action="Index">Home</a></li>
-                <li><a asp-controller="Activities" asp-action="Index">Activities</a></li>
-                <li><a asp-controller="Activities" asp-action="Joined">Joined</a></li>
-                <li><a asp-controller="Categories" asp-action="Index">Categories</a></li>
-                <li><a asp-controller="Cities" asp-action="Index">Cities</a></li>
-                <li><a asp-controller="Organizer" asp-action="Index">Organizers</a></li>
+                <li><a asp-controller="Home" asp-action="Index">Начало</a></li>
+                <li><a asp-controller="Activities" asp-action="Index">Дейности</a></li>
+                <li><a asp-controller="Activities" asp-action="Joined">Записани</a></li>
+                <li><a asp-controller="Categories" asp-action="Index">Категории</a></li>
+                <li><a asp-controller="Cities" asp-action="Index">Градове</a></li>
+                <li><a asp-controller="Organizer" asp-action="Index">Организатори</a></li>
             </ul>
         </div>
         <div class="navbar-center">
-            <a href="~/"><img src="~/images/logo.png" alt="Logo" /></a>
+            <a href="~/"><img src="~/images/logo.png" alt="Лого" /></a>
         </div>
         <div class="navbar-right">
             <div class="navbar-user">
                 @if (User.Identity.IsAuthenticated)
                 {
-                    <span class="username">Hello, @User.Identity.Name</span>
+                    <span class="username">Здравей, @User.Identity.Name</span>
                     <form asp-area="Identity" asp-page="/Account/Logout" method="post">
-                        <button type="submit" class="btn-custom">Logout</button>
+                        <button type="submit" class="btn-custom">Изход</button>
                     </form>
                 }
                 else
                 {
-                    <a asp-area="Identity" asp-page="/Account/Login" class="btn-custom">Login</a>
-                    <a asp-area="Identity" asp-page="/Account/Register" class="btn-custom ms-2">Register</a>
+                    <a asp-area="Identity" asp-page="/Account/Login" class="btn-custom">Вход</a>
+                    <a asp-area="Identity" asp-page="/Account/Register" class="btn-custom ms-2">Регистрация</a>
                 }
             </div>
         </div>

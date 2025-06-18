@@ -1,18 +1,18 @@
-@model IEnumerable<EventPlannerPro.Models.Category>
+﻿@model IEnumerable<EventPlannerPro.Models.Category>
 @{
-    ViewData["Title"] = "Categories";
+    ViewData["Title"] = "Категории";
     bool isAdmin = User.IsInRole("Admin");
 }
 
 <div class="container-fixed">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Categories</h2>
-        <a asp-action="Create" class="btn-custom">Create New Category</a>
+        <h2>@ViewData["Title"]</h2>
+        <a asp-action="Create" class="btn-custom">Създаване на нова категория</a>
     </div>
 
     @if (!Model.Any())
     {
-        <p class="text-muted">No categories found.</p>
+        <p class="text-muted">Няма намерени категории.</p>
     }
     else
     {
@@ -34,19 +34,19 @@
                                asp-action="Index"
                                asp-route-categoryId="@cat.Id"
                                class="btn-custom btn-sm">
-                                View Activities
+                                Виж събития
                             </a>
                             @if (isAdmin)
                             {
-                                <a asp-action="Edit" asp-route-id="@cat.Id" class="btn-custom btn-sm">Edit</a>
+                                <a asp-action="Edit" asp-route-id="@cat.Id" class="btn-custom btn-sm">Редактирай</a>
                                 <form asp-action="Delete"
                                       asp-route-id="@cat.Id"
                                       method="post"
                                       class="d-inline">
                                     <button type="submit"
                                             class="btn-custom btn-sm"
-                                            onclick="return confirm('Delete this category?');">
-                                        Delete
+                                            onclick="return confirm('Наистина ли желаете да изтриете тази категория?');">
+                                        Изтрий
                                     </button>
                                 </form>
                             }

@@ -1,33 +1,33 @@
-@{
+﻿@{
     ViewData["Title"] = "Create New Activity";
     Layout = "_Layout";
 }
 
 <main class="container-fixed">
     <div class="form-container mx-auto" style="max-width:600px;">
-        <h2 class="text-center mb-4">Create New Activity</h2>
+        <h2 class="text-center mb-4">Създай ново събитие</h2>
 
         <form asp-action="CreateSimple" method="post">
             <div class="mb-3">
-                <label class="form-label">Title</label>
+                <label class="form-label">Заглавие</label>
                 <input name="title" class="form-control" />
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Description</label>
+                <label class="form-label">Описание</label>
                 <textarea name="description" class="form-control"></textarea>
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Photo URL</label>
+                <label class="form-label">URL на снимка</label>
                 <input name="photoUrl" class="form-control" />
             </div>
 
             <div class="row gx-3 mb-3">
                 <div class="col-md-6">
-                    <label class="form-label">City</label>
+                    <label class="form-label">Град</label>
                     <select name="cityId" class="form-select">
-                        <option value="">� none �</option>
+                        <option value="">– няма –</option>
                         @foreach (var city in (IEnumerable<EventPlannerPro.Models.City>)ViewBag.Cities)
                         {
                             <option value="@city.Id">@city.Name</option>
@@ -35,9 +35,9 @@
                     </select>
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Category</label>
+                    <label class="form-label">Категория</label>
                     <select name="categoryId" class="form-select">
-                        <option value="">� none �</option>
+                        <option value="">– няма –</option>
                         @foreach (var cat in (IEnumerable<EventPlannerPro.Models.Category>)ViewBag.Categories)
                         {
                             <option value="@cat.Id">@cat.Name</option>
@@ -48,17 +48,17 @@
 
             <div class="row gx-3 mb-3">
                 <div class="col-md-6">
-                    <label class="form-label">Date & Time</label>
+                    <label class="form-label">Дата и час</label>
                     <input name="startTime" type="datetime-local" class="form-control" />
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Capacity</label>
+                    <label class="form-label">Капацитет</label>
                     <input name="capacity" type="number" class="form-control" />
                 </div>
             </div>
 
             <div class="d-grid">
-                <button type="submit" class="btn-custom">Create Activity</button>
+                <button type="submit" class="btn-custom">Създай дейност</button>
             </div>
         </form>
     </div>
