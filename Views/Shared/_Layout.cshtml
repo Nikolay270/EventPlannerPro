@@ -4,12 +4,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@ViewData["Title"] - Event Planner Pro</title>
+
+  
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    @RenderSection("Head", required: false)
 </head>
 <body>
-    <nav class="navbar-custom">
+    <nav class="navbar-custom" role="navigation" aria-label="Основна навигация">
         <div class="navbar-left">
             <ul class="navbar-menu">
                 <li><a asp-controller="Home" asp-action="Index">Начало</a></li>
@@ -20,15 +25,19 @@
                 <li><a asp-controller="Organizer" asp-action="Index">Организатори</a></li>
             </ul>
         </div>
+
         <div class="navbar-center">
-            <a href="~/"><img src="~/images/logo.png" alt="Лого" /></a>
+            <a asp-controller="Home" asp-action="Index">
+                <img src="~/images/logo.png" alt="Лого на Event Planner Pro" asp-append-version="true" />
+            </a>
         </div>
+
         <div class="navbar-right">
             <div class="navbar-user">
-                @if (User.Identity.IsAuthenticated)
+                @if (User.Identity?.IsAuthenticated ?? false)
                 {
-                    <span class="username">Здравей, @User.Identity.Name</span>
-                    <form asp-area="Identity" asp-page="/Account/Logout" method="post">
+                    <span class="username">Здравей, @User.Identity!.Name</span>
+                    <form asp-area="Identity" asp-page="/Account/Logout" method="post" asp-antiforgery="true" class="d-inline">
                         <button type="submit" class="btn-custom">Изход</button>
                     </form>
                 }
@@ -40,11 +49,13 @@
             </div>
         </div>
     </nav>
+
     <main>
         @RenderBody()
     </main>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>
