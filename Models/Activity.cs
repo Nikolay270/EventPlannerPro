@@ -34,7 +34,6 @@ namespace EventPlannerPro.Models
         [Display(Name = "Capacity")]
         public int Capacity { get; set; }
 
-        // Now uses your own ActivityUser type
         public ICollection<ActivityUser> Participants { get; set; } = new List<ActivityUser>();
 
         // Track the creator
