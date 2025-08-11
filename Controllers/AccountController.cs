@@ -35,5 +35,11 @@ namespace EventPlannerPro.Controllers
             foreach (var e in result.Errors) ModelState.AddModelError("", e.Description);
             return View(vm);
         }
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
+        }
     }
 }

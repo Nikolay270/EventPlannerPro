@@ -37,7 +37,7 @@
                 @if (User.Identity?.IsAuthenticated ?? false)
                 {
                     <span class="username">Здравей, @User.Identity!.Name</span>
-                    <form asp-area="Identity" asp-page="/Account/Logout" method="post" asp-antiforgery="true" class="d-inline">
+                    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
                         <button type="submit" class="btn-custom">Изход</button>
                     </form>
                 }
