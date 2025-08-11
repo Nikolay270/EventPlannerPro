@@ -4,9 +4,63 @@
     bool isAdmin = User.IsInRole("Admin");
 }
 
-<div class="container-fixed">
+@section Head {
+    <style>
+        .cat-section {
+            padding-block: 2rem;
+        }
+
+        .cat-card {
+            border: none;
+            border-radius: 1rem;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 4px 16px rgba(0,0,0,.08);
+            transition: transform .18s ease, box-shadow .18s ease;
+        }
+
+            .cat-card:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 10px 28px rgba(0,0,0,.12);
+            }
+
+        .cat-img {
+            display: block;
+            width: 100%;
+            height: 220px; /* uniform height for alignment */
+            object-fit: cover; /* crop nicely */
+        }
+
+        .cat-body {
+            padding: 1rem 1.25rem .75rem;
+        }
+
+        .cat-title {
+            font-weight: 600;
+            color: #0d6efd;
+            margin: 0;
+            text-align: center;
+        }
+
+        .cat-footer {
+            padding: .75rem 1.25rem 1rem;
+            background: linear-gradient(180deg, #fff, #fafbff);
+            border-top: 1px solid rgba(0,0,0,.05);
+        }
+
+        .cat-actions {
+            gap: .5rem;
+        }
+        /* keep your existing .btn-custom, just ensure min widths match */
+        .btn-custom.btn-sm {
+            min-width: 110px;
+        }
+    </style>
+}
+
+<div class="container-fixed cat-section">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>@ViewData["Title"]</h2>
+        <h2 class="fw-bold m-0">@ViewData["Title"]</h2>
         <a asp-action="Create" class="btn-custom">Създаване на нова категория</a>
     </div>
 
@@ -16,40 +70,50 @@
     }
     else
     {
-        <!-- Force exactly 3 columns -->
-        <div class="row row-cols-3 g-4">
+        <!-- Responsive: 1 / 2 / 3 columns -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             @foreach (var cat in Model)
             {
                 <div class="col">
-                    <div class="activity-card text-center">
+                    <div class="cat-card h-100">
                         @if (!string.IsNullOrEmpty(cat.PhotoUrl))
                         {
-                            <img src="@cat.PhotoUrl" alt="@cat.Name" class="card-img-top" />
+                            <img src="@cat.PhotoUrl" alt="@cat.Name" class="cat-img" />
                         }
-                        <div class="activity-card-body">
-                            <h5>@cat.Name</h5>
+
+                        <div class="cat-body">
+                            <h5 class="cat-title">@cat.Name</h5>
                         </div>
-                        <div class="activity-card-footer">
-                            <a asp-controller="Activities"
-                               asp-action="Index"
-                               asp-route-categoryId="@cat.Id"
-                               class="btn-custom btn-sm">
-                                Виж събития
-                            </a>
-                            @if (isAdmin)
-                            {
-                                <a asp-action="Edit" asp-route-id="@cat.Id" class="btn-custom btn-sm">Редактирай</a>
-                                <form asp-action="Delete"
-                                      asp-route-id="@cat.Id"
-                                      method="post"
-                                      class="d-inline">
-                                    <button type="submit"
-                                            class="btn-custom btn-sm"
-                                            onclick="return confirm('Наистина ли желаете да изтриете тази категория?');">
-                                        Изтрий
-                                    </button>
-                                </form>
-                            }
+
+                        <div class="cat-footer">
+                            <div class="d-flex justify-content-center flex-wrap cat-actions">
+                                <a asp-controller="Activities"
+                                   asp-action="Index"
+                                   asp-route-categoryId="@cat.Id"
+                                   class="btn btn-outline-primary btn-sm btn-custom">
+                                    Виж събития
+                                </a>
+
+                                @if (isAdmin)
+                                {
+                                    <a asp-action="Edit"
+                                       asp-route-id="@cat.Id"
+                                       class="btn btn-outline-success btn-sm btn-custom">
+                                        Редактирай
+                                    </a>
+
+                                    <form asp-action="Delete"
+                                          asp-route-id="@cat.Id"
+                                          method="post"
+                                          class="d-inline">
+                                        <button type="submit"
+                                                class="btn btn-outline-danger btn-sm btn-custom"
+                                                onclick="return confirm('Наистина ли желаете да изтриете тази категория?');">
+                                            Изтрий
+                                        </button>
+                                    </form>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
