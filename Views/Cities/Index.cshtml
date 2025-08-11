@@ -4,9 +4,47 @@
     bool isAdmin = User.IsInRole("Admin");
 }
 
-<div class="container-fixed">
+@section Head {
+    <style>
+        .city-section { padding-block: 2rem; }
+        .city-card {
+            border: none;
+            border-radius: 1rem;
+            overflow: hidden;
+            background: #fff;
+            box-shadow: 0 4px 16px rgba(0,0,0,.08);
+            transition: transform .18s ease, box-shadow .18s ease;
+        }
+        .city-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 28px rgba(0,0,0,.12);
+        }
+        .city-img {
+            display: block;
+            width: 100%;
+            height: 220px;      /* uniform height for alignment */
+            object-fit: cover;  /* crop nicely */
+        }
+        .city-body { padding: 1rem 1.25rem .75rem; }
+        .city-title {
+            font-weight: 600;
+            color: #0d6efd;
+            margin: 0;
+            text-align: center;
+        }
+        .city-footer {
+            padding: .75rem 1.25rem 1rem;
+            background: linear-gradient(180deg, #fff, #fafbff);
+            border-top: 1px solid rgba(0,0,0,.05);
+        }
+        .city-actions { gap: .5rem; }
+        .btn-custom.btn-sm { min-width: 110px; }
+    </style>
+}
+
+<div class="container-fixed city-section">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>@ViewData["Title"]</h2>
+        <h2 class="fw-bold m-0">@ViewData["Title"]</h2>
         <a asp-action="Create" class="btn-custom">Създаване на нов град</a>
     </div>
 
@@ -16,40 +54,50 @@
     }
     else
     {
-        <!-- Force exactly 3 columns -->
-        <div class="row row-cols-3 g-4">
+        <!-- Responsive: 1 / 2 / 3 columns -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             @foreach (var city in Model)
             {
                 <div class="col">
-                    <div class="activity-card text-center">
+                    <div class="city-card h-100">
                         @if (!string.IsNullOrEmpty(city.PhotoUrl))
                         {
-                            <img src="@city.PhotoUrl" alt="@city.Name" class="card-img-top" />
+                            <img src="@city.PhotoUrl" alt="@city.Name" class="city-img" />
                         }
-                        <div class="activity-card-body">
-                            <h5>@city.Name</h5>
+
+                        <div class="city-body">
+                            <h5 class="city-title">@city.Name</h5>
                         </div>
-                        <div class="activity-card-footer">
-                            <a asp-controller="Activities"
-                               asp-action="ByCity"
-                               asp-route-cityId="@city.Id"
-                               class="btn-custom btn-sm">
-                                Виж събития
-                            </a>
-                            @if (isAdmin)
-                            {
-                                <a asp-action="Edit" asp-route-id="@city.Id" class="btn-custom btn-sm">Редактирай</a>
-                                <form asp-action="Delete"
-                                      asp-route-id="@city.Id"
-                                      method="post"
-                                      class="d-inline">
-                                    <button type="submit"
-                                            class="btn-custom btn-sm"
-                                            onclick="return confirm('Наистина ли желаете да изтриете този град?');">
-                                        Изтрий
-                                    </button>
-                                </form>
-                            }
+
+                        <div class="city-footer">
+                            <div class="d-flex justify-content-center flex-wrap city-actions">
+                                <a asp-controller="Activities"
+                                   asp-action="ByCity"
+                                   asp-route-cityId="@city.Id"
+                                   class="btn btn-outline-primary btn-sm btn-custom">
+                                    Виж събития
+                                </a>
+
+                                @if (isAdmin)
+                                {
+                                    <a asp-action="Edit"
+                                       asp-route-id="@city.Id"
+                                       class="btn btn-outline-success btn-sm btn-custom">
+                                        Редактирай
+                                    </a>
+
+                                    <form asp-action="Delete"
+                                          asp-route-id="@city.Id"
+                                          method="post"
+                                          class="d-inline">
+                                        <button type="submit"
+                                                class="btn btn-outline-danger btn-sm btn-custom"
+                                                onclick="return confirm('Наистина ли желаете да изтриете този град?');">
+                                            Изтрий
+                                        </button>
+                                    </form>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
