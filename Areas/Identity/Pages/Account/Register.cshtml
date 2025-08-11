@@ -4,9 +4,30 @@
     ViewData["Title"] = "Регистрация";
 }
 
-<div class="container d-flex flex-column justify-content-center align-items-center" style="min-height: 85vh;">
-    <h2 class="mb-4">@ViewData["Title"]</h2>
-    <div class="w-100" style="max-width: 500px;">
+@section Head {
+    <style>
+        .register-bg {
+            background: linear-gradient(135deg, #f0f7ff, #e8f0ff);
+        }
+
+        .register-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            padding: 2rem;
+        }
+
+        .register-title {
+            font-weight: 600;
+            color: #0d6efd;
+        }
+    </style>
+}
+
+<div class="container-fluid register-bg d-flex flex-column justify-content-center align-items-center" style="min-height: 85vh;">
+    <div class="register-card w-100" style="max-width: 520px;">
+        <h2 class="text-center mb-4 register-title">@ViewData["Title"]</h2>
+
         <form method="post" class="row g-3">
             <div asp-validation-summary="All" class="text-danger col-12"></div>
 
@@ -35,7 +56,14 @@
             </div>
 
             <div class="col-12 d-grid">
-                <button type="submit" class="btn btn-primary">Регистрация</button>
+                <button type="submit" class="btn btn-primary py-2">Регистрация</button>
+            </div>
+
+            <div class="col-12 text-center">
+                <small class="text-muted">
+                    Вече имате акаунт?
+                    <a asp-page="./Login">Вход</a>
+                </small>
             </div>
         </form>
     </div>
